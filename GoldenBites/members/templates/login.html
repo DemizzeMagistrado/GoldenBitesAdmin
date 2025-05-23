@@ -1,0 +1,270 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golden Bites - Sign In</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Auth container */
+        .auth-container {
+            width: 100%;
+            max-width: 400px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 30px;
+        }
+
+        .auth-form {
+            width: 100%;
+        }
+
+        .form-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .form-subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: #4a7bca;
+            outline: none;
+        }
+
+        .form-checkbox {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .form-checkbox input {
+            margin-right: 8px;
+        }
+
+        .form-link {
+            color: #4a7bca;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .form-link:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            background-color: #4a7bca;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #3a6cb8;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .social-login {
+            margin-top: 25px;
+            text-align: center; /* Center the button within its container */
+        }
+
+        .social-login button {
+            transition: all 0.2s;
+            display: inline-flex; /* Use inline-flex to allow centering with text-align */
+            justify-content: center; /* Center content horizontally */
+            align-items: center; /* Center content vertically */
+            margin: 0 auto; /* Center the button itself */
+            width: 100%; /* Ensure it takes full width of its container */
+        }
+
+        .social-login button:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Error message */
+        .error-message {
+            color: #d32f2f;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .auth-container {
+                padding: 20px;
+                border-radius: 8px;
+            }
+            
+            .form-title {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-form">
+            <h2 class="form-title">Sign in</h2>
+            <p class="form-subtitle">Please sign in first to enjoy the service</p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="email">Email</label>
+                    <input type="email" id="email" class="form-input" placeholder="email" required>
+                    <div class="error-message" id="email-error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" id="password" class="form-input" placeholder="password" required>
+                    <div class="error-message" id="password-error"></div>
+                </div>
+                
+                <div class="form-checkbox">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">Remember me</label>
+                    <a href="{% url 'reset_password' %}" class="form-link" style="margin-left: auto;">Forgot password?</a>
+                </div>
+                
+                <button type="submit" class="btn" id="login-btn">Login</button>
+                
+                <div class="form-footer">
+                    Not a member? <a href="{% url 'register' %}" class="form-link">Register now</a>
+                </div>
+                
+                <div class="social-login">
+                <button type="button" class="w-full bg-white border py-2 rounded text-sm flex items-center justify-center">
+                    <img src="{% static 'assets/google.png' %}" alt="G" class="w-5 h-5 mr-2" onerror="this.src='https://placehold.co/20x20/E0E0E0/333333?text=G'"> Continue with ADNU GBOX
+                </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get form elements
+        const loginForm = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const emailError = document.getElementById('email-error');
+        const passwordError = document.getElementById('password-error');
+        const loginBtn = document.getElementById('login-btn');
+        
+        // Add form submission handler
+        if (loginForm) {
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Reset error messages
+                if (emailError) emailError.style.display = 'none';
+                if (passwordError) passwordError.style.display = 'none';
+                
+                // Get form values
+                const email = emailInput ? emailInput.value.trim() : '';
+                const password = passwordInput ? passwordInput.value.trim() : '';
+                
+                // Validate email
+                if (!email) {
+                    if (emailError) {
+                        emailError.textContent = 'Please enter your email';
+                        emailError.style.display = 'block';
+                    }
+                    return;
+                }
+                
+                // Validate password
+                if (!password) {
+                    if (passwordError) {
+                        passwordError.textContent = 'Please enter your password';
+                        passwordError.style.display = 'block';
+                    }
+                    return;
+                }
+                
+                // For demo purposes, just redirect to home page
+                // This line ensures that after a successful customer login, the user is redirected to the home page.
+                window.location.href = "{% url 'home' %}";
+            });
+        }
+        
+        // Add click handler for login button (as a backup)
+        if (loginBtn) {
+            loginBtn.addEventListener('click', function(e) {
+                // If not in a form, handle the click
+                if (!loginForm) {
+                    e.preventDefault();
+                    // This line ensures that after a successful customer login, the user is redirected to the home page.
+                    window.location.href = "{% url 'home' %}";
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

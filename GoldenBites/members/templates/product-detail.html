@@ -1,0 +1,814 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golden Bites - Product Detail</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Ensure Inter font is used */
+        }
+
+        body {
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* App Layout */
+        .app-layout {
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            min-height: 100vh;
+            background-color: #fff;
+            border-left: 1px solid #ccc;
+            border-right: 1px solid #ccc;
+            margin: 0 auto;
+            max-width: 600px;
+        }
+
+        /* Main Header */
+        .main-header {
+            position: sticky;
+            top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            z-index: 100;
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-left {
+            color: #4a7bca;
+        }
+
+        .header-center {
+            flex: 1;
+            text-align: center;
+        }
+
+        .header-center h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .back-btn {
+            color: #4a7bca;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        /* Avatar */
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 0;
+            width: 100%;
+        }
+
+        /* Product Detail */
+        .product-detail {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-image-container {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            overflow: hidden;
+        }
+
+        .product-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-tags {
+            display: flex;
+            gap: 10px;
+            padding: 15px 20px 0;
+        }
+
+        .tag {
+            background-color: #ffedcc;
+            color: #ff9800;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .product-content {
+            padding: 15px 20px;
+        }
+
+        .product-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .star {
+            margin-right: 5px;
+        }
+
+        .review-link {
+            margin-left: 10px;
+            color: #4a7bca;
+            cursor: pointer;
+        }
+
+        .product-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: #4a7bca;
+            margin-bottom: 20px;
+        }
+
+        .product-description {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        /* Quantity Control */
+        .quantity-control-container {
+            margin-bottom: 20px;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            width: fit-content;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .qty-btn-minus, .qty-btn-plus {
+            width: 40px;
+            height: 40px;
+            background-color: #f5f5f5;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qty-value {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            background-color: white;
+        }
+
+        /* Add-ons */
+        .add-ons {
+            margin-bottom: 20px;
+        }
+
+        .options-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .option-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .option-name {
+            font-size: 14px;
+        }
+
+        .option-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .option-price {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .addon-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .primary-btn {
+            background-color: #4a7bca;
+            color: white;
+        }
+
+        .primary-btn:hover {
+            background-color: #3a6cb8;
+        }
+
+        .secondary-btn {
+            background-color: #f5f5f5;
+            color: #4a7bca;
+            border: 1px solid #4a7bca;
+        }
+
+        .secondary-btn:hover {
+            background-color: #e8f0fe;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Custom Alert Modal */
+        .custom-alert-modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1001; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .custom-alert-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 300px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+        }
+
+        .custom-alert-content h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .custom-alert-content p {
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        .custom-alert-content button {
+            background-color: #4a7bca;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+
+        .custom-alert-content button:hover {
+            background-color: #3a6cb8;
+        }
+
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .product-image-container {
+                height: 220px;
+            }
+            
+            .product-name {
+                font-size: 20px;
+            }
+            
+            .product-price {
+                font-size: 20px;
+            }
+            
+            .action-btn {
+                padding: 12px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <header class="main-header">
+            <div class="header-left">
+                <a href="#" class="back-btn" id="back-btn"><i class="fas fa-arrow-left"></i></a>
+            </div>
+            <div class="header-center">
+                <h1>Product Details</h1>
+            </div>
+            <div class="header-right">
+                <!-- <div class="avatar">
+                    <i class="fa fa-gear" style="font-size:24px"></i>
+                </div> -->
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="product-detail">
+                <div class="product-image-container">
+                    <img src="https://placehold.co/600x300/E0E0E0/333333?text=Product+Image" alt="Product" class="product-img" id="product-image">
+                </div>
+
+                <div class="product-tags" id="product-tags">
+                    </div>
+
+                <div class="product-content">
+                    <h1 class="product-name" id="product-name">Product Name</h1>
+                    <div class="product-rating">
+                        <span class="star">⭐</span>
+                        <span id="product-rating">4.5</span>
+                        <span class="review-link" id="review-link">(See Review)</span>
+                    </div>
+
+                    <div class="product-price" id="product-price">₱ 0.00</div>
+                    
+                    <p class="product-description" id="product-description">
+                        This is a delicious product from Golden Bites. Perfect for breakfast or as a snack anytime during the day.
+                    </p>
+
+                    <div class="quantity-control-container">
+                        <div class="quantity-control">
+                            <button class="qty-btn-minus" id="qty-btn-minus">-</button>
+                            <span class="qty-value" id="qty-value">1</span>
+                            <button class="qty-btn-plus" id="qty-btn-plus">+</button>
+                        </div>
+                    </div>
+
+                    <div class="add-ons" id="add-ons-container">
+                        <h3 class="options-title">Choice of Add On</h3>
+                        </div>
+
+                    <div class="action-buttons">
+                        <button class="action-btn secondary-btn" id="add-to-cart-btn">Add to cart</button>
+                        <button class="action-btn primary-btn" id="buy-now-btn">Buy now</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="toast" id="toast">Item added to cart!</div>
+
+    <div id="customAlertModal" class="custom-alert-modal">
+        <div class="custom-alert-content">
+            <h3 id="customAlertTitle"></h3>
+            <p id="customAlertMessage"></p>
+            <button id="customAlertOkButton">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to show custom alert modal
+        function showAlert(title, message) {
+            const modal = document.getElementById('customAlertModal');
+            const titleElement = document.getElementById('customAlertTitle');
+            const messageElement = document.getElementById('customAlertMessage');
+            const okButton = document.getElementById('customAlertOkButton');
+
+            titleElement.textContent = title;
+            messageElement.textContent = message;
+            modal.style.display = 'flex'; // Show the modal
+
+            okButton.onclick = function() {
+                modal.style.display = 'none'; // Hide the modal when OK is clicked
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in (for demo purposes, we'll allow access without login)
+            const currentUser = localStorage.getItem('currentUser');
+            if (!currentUser) {
+                console.log('User not logged in, but allowing access for demo');
+            }
+            
+            // Get product ID from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            // Default to 'pancake' if no ID is provided in the URL
+            const productId = urlParams.get('id') || 'pancake'; 
+            
+            // Product database (in a real app, this would come from a server)
+            const products = {
+                'pancake': {
+                    id: 'pancake',
+                    name: 'Pancake',
+                    price: 20.00,
+                    description: 'Fluffy pancakes made with fresh ingredients. Perfect for breakfast or as a sweet treat.',
+                    image: 'https://placehold.co/600x300/E0E0E0/333333?text=Pancake',
+                    rating: 4.5,
+                    tags: ['Popular', 'Breakfast'],
+                    addons: [
+                        { name: 'Honey', price: 20 },
+                        { name: 'Butter', price: 20 },
+                        { name: 'Chocolate Syrup', price: 50 }
+                    ]
+                },
+                'waffle': {
+                    id: 'waffle',
+                    name: 'Waffle',
+                    price: 25.00,
+                    description: 'Crispy on the outside, soft on the inside. Our waffles are a customer favorite.',
+                    image: 'https://placehold.co/600x300/E0E0E0/333333?text=Waffle',
+                    rating: 4.3,
+                    tags: ['Popular', 'Breakfast'],
+                    addons: [
+                        { name: 'Honey', price: 20 },
+                        { name: 'Butter', price: 20 },
+                        { name: 'Chocolate Syrup', price: 50 },
+                        { name: 'Ice Cream', price: 30 }
+                    ]
+                },
+                'adobo': {
+                    id: 'adobo',
+                    name: 'Adobo',
+                    price: 75.00,
+                    description: 'Traditional Filipino adobo with tender meat marinated in soy sauce, vinegar, and spices.',
+                    image: 'https://placehold.co/600x300/E0E0E0/333333?text=Adobo',
+                    rating: 4.8,
+                    tags: ['Popular', 'Main Dish'],
+                    addons: [
+                        { name: 'Extra Rice', price: 15 },
+                        { name: 'Egg', price: 10 }
+                    ]
+                }
+            };
+            
+            // Get product data based on the ID from the URL. 
+            // If the ID is invalid or not found, it defaults to 'pancake'.
+            const product = products[productId] || products['pancake'];
+            
+            // Update page with product data
+            updateProductDetails(product);
+            
+            // Add event listeners
+            setupEventListeners(product);
+
+            // Initialize total price display after all elements and event listeners are set up
+            updateTotalPrice(product);
+        });
+        
+        // Function to update product details on the page
+        function updateProductDetails(product) {
+            // Update product name
+            const productNameElement = document.getElementById('product-name');
+            if (productNameElement) {
+                productNameElement.textContent = product.name;
+            }
+            
+            // Update product image
+            const productImageElement = document.getElementById('product-image');
+            if (productImageElement) {
+                productImageElement.src = product.image;
+                productImageElement.alt = product.name;
+            }
+            
+            // Update product rating
+            const productRatingElement = document.getElementById('product-rating');
+            if (productRatingElement) {
+                productRatingElement.textContent = product.rating;
+            }
+            
+            // Update product price - initial display will be handled by updateTotalPrice
+            // const productPriceElement = document.getElementById('product-price');
+            // if (productPriceElement) {
+            //     productPriceElement.textContent = `₱ ${product.price.toFixed(2)}`;
+            // }
+            
+            // Update product description
+            const productDescriptionElement = document.getElementById('product-description');
+            if (productDescriptionElement) {
+                productDescriptionElement.textContent = product.description;
+            }
+            
+            // Update page title
+            document.title = `Golden Bites - ${product.name}`;
+            
+            // Update header title
+            const headerTitleElement = document.querySelector('.header-center h1');
+            if (headerTitleElement) {
+                headerTitleElement.textContent = product.name;
+            }
+            
+            // Update product tags
+            const productTagsElement = document.getElementById('product-tags'); 
+            if (productTagsElement && product.tags) {
+                productTagsElement.innerHTML = ''; // Clear existing tags
+                product.tags.forEach(tag => {
+                    const tagElement = document.createElement('span');
+                    tagElement.className = 'tag';
+                    tagElement.textContent = tag;
+                    productTagsElement.appendChild(tagElement);
+                });
+            }
+            
+            // Update add-ons
+            const addOnsContainer = document.getElementById('add-ons-container');
+            if (addOnsContainer && product.addons) {
+                // Clear existing add-ons, but keep the title
+                addOnsContainer.innerHTML = '<h3 class="options-title">Choice of Add On</h3>';
+                
+                // Add new add-ons
+                product.addons.forEach(addon => {
+                    const optionItem = document.createElement('div');
+                    optionItem.className = 'option-item';
+                    
+                    optionItem.innerHTML = `
+                        <span class="option-name">${addon.name}</span>
+                        <div class="option-right">
+                            <span class="option-price">+₱ ${addon.price.toFixed(2)}</span>
+                            <input type="checkbox" class="addon-checkbox" data-name="${addon.name}" data-price="${addon.price}">
+                        </div>
+                    `;
+                    
+                    addOnsContainer.appendChild(optionItem);
+                });
+
+                // Re-attach event listeners for newly created checkboxes
+                const newAddonCheckboxes = addOnsContainer.querySelectorAll('.addon-checkbox');
+                newAddonCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        updateTotalPrice(product);
+                    });
+                });
+            }
+        }
+        
+        // Function to set up event listeners
+        function setupEventListeners(product) {
+            // Back button
+            const backBtn = document.getElementById('back-btn');
+            if (backBtn) {
+                backBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.history.back();
+                });
+            }
+            
+            // Quantity control buttons
+            const qtyBtnMinus = document.getElementById('qty-btn-minus');
+            const qtyBtnPlus = document.getElementById('qty-btn-plus');
+            const qtyValue = document.getElementById('qty-value');
+            
+            if (qtyBtnMinus && qtyBtnPlus && qtyValue) {
+                // Decrease quantity
+                qtyBtnMinus.addEventListener('click', function() {
+                    let quantity = parseInt(qtyValue.textContent);
+                    if (quantity > 1) {
+                        quantity--;
+                        qtyValue.textContent = quantity;
+                        updateTotalPrice(product);
+                    }
+                });
+                
+                // Increase quantity
+                qtyBtnPlus.addEventListener('click', function() {
+                    let quantity = parseInt(qtyValue.textContent);
+                    quantity++;
+                    qtyValue.textContent = quantity;
+                    updateTotalPrice(product);
+                });
+            }
+            
+            // Add-on checkboxes (initial setup for existing, and will be re-attached by updateProductDetails for new)
+            // This needs to be called after add-ons are populated in updateProductDetails
+            // so moved to be called within updateProductDetails and also here for initial setup if any default addons are present.
+            const addonCheckboxes = document.querySelectorAll('.addon-checkbox');
+            addonCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    updateTotalPrice(product);
+                });
+            });
+            
+            // Add to cart button
+            const addToCartBtn = document.getElementById('add-to-cart-btn');
+            if (addToCartBtn) {
+                addToCartBtn.addEventListener('click', function() {
+                    addToCart(product);
+                    showToast('Item added to cart!');
+                });
+            }
+            
+            // Buy now button
+            const buyNowBtn = document.getElementById('buy-now-btn');
+            if (buyNowBtn) {
+                buyNowBtn.addEventListener('click', function() {
+                    buyNow(product);
+                });
+            }
+            
+            // Review link
+            const reviewLink = document.getElementById('review-link');
+            if (reviewLink) {
+                reviewLink.addEventListener('click', function() {
+                    showAlert('Feature Coming Soon', 'Reviews feature coming soon!'); // Replaced alert()
+                });
+            }
+        }
+        
+        // Function to update total price based on quantity and selected add-ons
+        function updateTotalPrice(product) {
+            const qtyValue = document.getElementById('qty-value');
+            const productPriceElement = document.getElementById('product-price');
+            
+            if (!qtyValue || !productPriceElement) return;
+            
+            const quantity = parseInt(qtyValue.textContent);
+            let totalPrice = product.price;
+            
+            // Add prices of selected add-ons
+            const selectedAddons = document.querySelectorAll('.addon-checkbox:checked');
+            selectedAddons.forEach(addon => {
+                const addonPrice = parseFloat(addon.getAttribute('data-price'));
+                totalPrice += addonPrice;
+            });
+            
+            // Multiply by quantity
+            totalPrice *= quantity;
+            
+            // Update price display
+            productPriceElement.textContent = `₱ ${totalPrice.toFixed(2)}`;
+        }
+        
+        // Function to add product to cart
+        function addToCart(product) {
+            // Get quantity and selected add-ons
+            const quantity = parseInt(document.getElementById('qty-value').textContent);
+            const selectedAddons = [];
+            
+            document.querySelectorAll('.addon-checkbox:checked').forEach(addon => {
+                selectedAddons.push({
+                    name: addon.getAttribute('data-name'),
+                    price: parseFloat(addon.getAttribute('data-price'))
+                });
+            });
+            
+            // Create cart item
+            const cartItem = {
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                image: product.image,
+                quantity: quantity,
+                addons: selectedAddons
+            };
+            
+            // Get existing cart or create new one
+            let cart = [];
+            try {
+                const existingCart = localStorage.getItem('cart');
+                if (existingCart) {
+                    cart = JSON.parse(existingCart);
+                }
+            } catch (error) {
+                console.error('Error getting cart from localStorage:', error);
+            }
+            
+            // Check if item already exists in cart
+            const existingItemIndex = cart.findIndex(item => 
+                item.id === cartItem.id && 
+                // Deep comparison for addons array
+                JSON.stringify(item.addons) === JSON.stringify(cartItem.addons)
+            );
+            
+            if (existingItemIndex !== -1) {
+                // Update quantity if item already exists
+                cart[existingItemIndex].quantity += quantity;
+            } else {
+                // Add new item to cart
+                cart.push(cartItem);
+            }
+            
+            // Save cart to localStorage
+            try {
+                localStorage.setItem('cart', JSON.stringify(cart));
+            } catch (error) {
+                console.error('Error saving cart to localStorage:', error);
+            }
+        }
+        
+        // Function to buy now
+        function buyNow(product) {
+            // Add to cart first
+            addToCart(product);
+            
+            // Redirect to checkout page
+            // This assumes a Django URL setup, adjust if your backend is different
+            window.location.href = "{% url 'payment' %}"; 
+        }
+        
+        // Function to show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            if (!toast) return;
+            
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            // Hide toast after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

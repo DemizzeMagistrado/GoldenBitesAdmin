@@ -1,0 +1,871 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Golden Bites - Order Tracking</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    /* Reset and base styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Ensure Inter font is used */
+    }
+
+    body {
+        background-color: #f5f5f5;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* App Layout */
+    .app-layout {
+        display: flex;
+        flex-direction: column;
+        width: 100vw;
+        min-height: 100vh;
+        background-color: #fff;
+        border-left: 1px solid #ccc;
+        border-right: 1px solid #ccc;
+        margin: 0 auto;
+        max-width: 600px;
+    }
+
+    /* Main Header */
+    .main-header {
+        position: sticky;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 20px;
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        z-index: 100;
+    }
+
+    .header-left, .header-right {
+        display: flex;
+        align-items: center;
+    }
+
+    .header-left {
+        color: #4a7bca;
+    }
+
+    .header-center {
+        flex: 1;
+        text-align: center;
+    }
+
+    .header-center h1 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .back-btn {
+        color: #4a7bca;
+        text-decoration: none;
+        font-size: 18px;
+    }
+
+    /* Avatar */
+    .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+    .avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Main Content */
+    .main-content {
+        flex: 1;
+        padding: 20px;
+        width: 100%;
+    }
+
+    /* Tracking Container */
+    .tracking-container {
+        padding-bottom: 30px;
+    }
+
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .order-number {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .order-status {
+        font-size: 14px;
+        font-weight: 500;
+        color: #4a7bca;
+        padding: 5px 12px;
+        background-color: #e8f0fe;
+        border-radius: 20px;
+    }
+
+    /* Estimated Time */
+    .estimated-time {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .time-label {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 5px;
+    }
+
+    .time-value {
+        font-size: 36px;
+        font-weight: 700;
+        color: #4a7bca;
+        line-height: 1;
+    }
+
+    .time-unit {
+        font-size: 14px;
+        color: #666;
+        margin-top: 5px;
+    }
+
+    /* Progress Tracker */
+    .progress-tracker {
+        margin-bottom: 30px;
+    }
+
+    .progress-steps {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        padding: 0 10px;
+    }
+
+    .progress-bar {
+        position: absolute;
+        left: 25px;
+        top: 25px;
+        bottom: 25px;
+        width: 2px;
+        background-color: #ddd;
+        z-index: 1;
+    }
+
+    .step {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .step-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #f5f5f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: #999;
+        border: 2px solid #ddd;
+    }
+
+    .step-label {
+        font-size: 16px;
+        font-weight: 500;
+        color: #666;
+    }
+
+    .step.active .step-icon {
+        background-color: #e8f0fe;
+        color: #4a7bca;
+        border-color: #4a7bca;
+    }
+
+    .step.active .step-label {
+        color: #4a7bca;
+        font-weight: 600;
+    }
+
+    .step.completed .step-icon {
+        background-color: #4a7bca;
+        color: white;
+        border-color: #4a7bca;
+    }
+
+    /* Order Details */
+    .order-details, .delivery-details {
+        background-color: #f9f9f9;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .order-details h3, .delivery-details h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #333;
+    }
+
+    .order-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .order-item:last-child {
+        border-bottom: none;
+    }
+
+    .item-quantity {
+        font-size: 14px;
+        font-weight: 500;
+        color: #4a7bca;
+        margin-right: 10px;
+        min-width: 30px;
+    }
+
+    .item-details {
+        flex: 1;
+    }
+
+    .item-name {
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .item-addons {
+        font-size: 12px;
+        color: #888;
+        margin-top: 2px;
+    }
+
+    .item-price {
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+    }
+
+    /* Delivery Details */
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        font-size: 14px;
+        color: #666;
+    }
+
+    .detail-value {
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .action-btn {
+        flex: 1;
+        padding: 14px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        text-align: center;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .primary-btn {
+        background-color: #4a7bca;
+        color: white;
+    }
+
+    .primary-btn:hover {
+        background-color: #3a6cb8;
+    }
+
+    .secondary-btn {
+        background-color: #f5f5f5;
+        color: #4a7bca;
+        border: 1px solid #4a7bca;
+    }
+
+    .secondary-btn:hover {
+        background-color: #e8f0fe;
+    }
+
+    /* Custom Alert Modal */
+    .custom-alert-modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1001; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        justify-content: center;
+        align-items: center;
+    }
+
+    .custom-alert-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 300px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    }
+
+    .custom-alert-content h3 {
+        margin-top: 0;
+        color: #333;
+    }
+
+    .custom-alert-content p {
+        margin-bottom: 20px;
+        color: #555;
+    }
+
+    .custom-alert-content button {
+        background-color: #4a7bca;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.2s;
+    }
+
+    .custom-alert-content button:hover {
+        background-color: #3a6cb8;
+    }
+
+    /* Custom Confirm Modal specific styles */
+    .confirm-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .confirm-buttons button {
+        flex: 1;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .main-content {
+            padding: 15px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .order-number {
+            font-size: 16px;
+        }
+        
+        .time-value {
+            font-size: 30px;
+        }
+        
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
+        }
+        
+        .step-label {
+            font-size: 14px;
+        }
+        
+        .action-btn {
+            padding: 12px;
+            font-size: 14px;
+        }
+    }
+</style>
+</head>
+<body>
+<div class="app-layout">
+    <header class="main-header">
+        <div class="header-left">
+            <a href="#" class="back-btn" id="back-btn"><i class="fas fa-arrow-left"></i></a>
+        </div>
+        <div class="header-center">
+            <h1>Track Order</h1>
+        </div>
+        <div class="header-right">
+            <div class="avatar" id="avatar">
+                <i class="fa fa-gear" style="font-size:24px"></i>
+            </div>
+        </div>
+    </header>
+    
+    <main class="main-content">
+        <div class="tracking-container">
+            <div class="order-header">
+                <div class="order-number" id="order-number">Order #S3150</div>
+                <div class="order-status" id="order-status">Preparing</div>
+            </div>
+            
+            <div class="estimated-time">
+                <div class="time-label">Estimated Time</div>
+                <div class="time-value" id="estimated-minutes">3-5</div>
+                <div class="time-unit">minutes</div>
+            </div>
+            
+            <div class="progress-tracker">
+                <div class="progress-steps">
+                    <div class="progress-bar" id="progress-bar"></div>
+                    
+                    <div class="step completed" id="step-1">
+                        <div class="step-icon"><i class="fas fa-check"></i></div>
+                        <div class="step-label">Order Placed</div>
+                    </div>
+                    
+                    <div class="step active" id="step-2">
+                        <div class="step-icon"><i class="fas fa-utensils"></i></div>
+                        <div class="step-label">Preparing</div>
+                    </div>
+                    
+                    <div class="step" id="step-3">
+                        <div class="step-icon"><i class="fas fa-box"></i></div>
+                        <div class="step-label">Ready for Pickup</div>
+                    </div>
+                    
+                    <div class="step" id="step-4">
+                        <div class="step-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="step-label">Completed</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="order-details">
+                <h3>Order Summary</h3>
+                <div id="tracking-order-items">
+                    </div>
+            </div>
+            
+            <div class="delivery-details">
+                <h3>Order Details</h3>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Order Date:</div>
+                    <div class="detail-value" id="order-date">May 22, 2025</div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Payment Method:</div>
+                    <div class="detail-value" id="payment-method">Cash</div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Pickup Method:</div>
+                    <div class="detail-value" id="pickup-method">Pickup</div>
+                </div>
+                
+                <div class="detail-row" id="note-row" style="display: none;">
+                    <div class="detail-label">Note:</div>
+                    <div class="detail-value" id="order-note"></div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Total:</div>
+                    <div class="detail-value" id="order-total">₱0.00</div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <a href="{% url 'home' %}" class="action-btn secondary-btn" id="home-btn">Back to Home</a>
+                <a href="#" class="action-btn primary-btn" id="support-btn">Contact Support</a>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div id="customAlertModal" class="custom-alert-modal">
+    <div class="custom-alert-content">
+        <h3 id="customAlertTitle"></h3>
+        <p id="customAlertMessage"></p>
+        <button id="customAlertOkButton">OK</button>
+    </div>
+</div>
+
+<div id="customConfirmModal" class="custom-alert-modal">
+    <div class="custom-alert-content">
+        <h3 id="customConfirmTitle"></h3>
+        <p id="customConfirmMessage"></p>
+        <div class="confirm-buttons">
+            <button id="customConfirmYesButton">Yes</button>
+            <button id="customConfirmNoButton">No</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Function to show custom alert modal
+    function showAlert(title, message) {
+        const modal = document.getElementById('customAlertModal');
+        const titleElement = document.getElementById('customAlertTitle');
+        const messageElement = document.getElementById('customAlertMessage');
+        const okButton = document.getElementById('customAlertOkButton');
+
+        titleElement.textContent = title;
+        messageElement.textContent = message;
+        modal.style.display = 'flex'; // Show the modal
+
+        okButton.onclick = function() {
+            modal.style.display = 'none'; // Hide the modal when OK is clicked
+        };
+    }
+
+    // Function to show custom confirmation modal (not used in this page, but included for consistency)
+    function showConfirm(title, message) {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('customConfirmModal');
+            const titleElement = document.getElementById('customConfirmTitle');
+            const messageElement = document.getElementById('customConfirmMessage');
+            const yesButton = document.getElementById('customConfirmYesButton');
+            const noButton = document.getElementById('customConfirmNoButton');
+
+            titleElement.textContent = title;
+            messageElement.textContent = message;
+            modal.style.display = 'flex';
+
+            const cleanup = () => {
+                yesButton.onclick = null;
+                noButton.onclick = null;
+                modal.style.display = 'none';
+            };
+
+            yesButton.onclick = () => {
+                cleanup();
+                resolve(true);
+            };
+
+            noButton.onclick = () => {
+                cleanup();
+                resolve(false);
+            };
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // For demo purposes, we'll skip authentication check
+        
+        // Get current order from localStorage or use mock data
+        let orderData;
+        try {
+            const currentOrder = localStorage.getItem('currentOrder');
+            if (currentOrder) {
+                orderData = JSON.parse(currentOrder);
+            } else {
+                orderData = getMockOrderData();
+            }
+        } catch (error) {
+            console.error('Error getting order data:', error);
+            orderData = getMockOrderData();
+        }
+        
+        // Update order tracking UI
+        updateOrderTracking(orderData);
+        
+        // Add event listener to back button
+        const backBtn = document.getElementById('back-btn');
+        if (backBtn) {
+            backBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.history.back();
+            });
+        }
+        
+        // Add event listener to home button
+        const homeBtn = document.getElementById('home-btn');
+        if (homeBtn) {
+            homeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = "{% url 'dashboard' %}";
+            });
+        }
+        
+        // Add event listener to support button
+        const supportBtn = document.getElementById('support-btn');
+        if (supportBtn) {
+            supportBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                showAlert('Support', 'Support functionality would be implemented here.');
+            });
+        }
+        
+        // Add event listener to avatar
+        const avatar = document.getElementById('avatar');
+        if (avatar) {
+            avatar.addEventListener('click', function() {
+                showAlert('User Profile', 'User profile functionality would be implemented here.');
+            });
+        }
+        
+        // Simulate order progress
+        simulateOrderProgress();
+    });
+    
+    // Function to get mock order data
+    function getMockOrderData() {
+        return {
+            orderNumber: 'S3150',
+            status: 'Preparing',
+            items: [
+                { name: 'Pancake', quantity: 2, price: 20 },
+                { name: 'Adobo', quantity: 1, price: 75, addons: [{ name: 'Extra Rice', price: 15 }] }
+            ],
+            total: 130,
+            paymentMethod: 'Cash',
+            pickupMethod: 'Pickup',
+            note: '',
+            date: new Date().toISOString()
+        };
+    }
+    
+    // Function to update order tracking UI
+    function updateOrderTracking(orderData) {
+        // Update order number
+        const orderNumberElement = document.getElementById('order-number');
+        if (orderNumberElement) {
+            orderNumberElement.textContent = `Order #${orderData.orderNumber}`;
+        }
+        
+        // Update order status
+        const orderStatusElement = document.getElementById('order-status');
+        if (orderStatusElement) {
+            orderStatusElement.textContent = orderData.status;
+        }
+        
+        // Update estimated time based on status
+        const estimatedMinutesElement = document.getElementById('estimated-minutes');
+        if (estimatedMinutesElement) {
+            switch (orderData.status.toLowerCase()) {
+                case 'pending':
+                    estimatedMinutesElement.textContent = '5-10';
+                    break;
+                case 'preparing':
+                    estimatedMinutesElement.textContent = '3-5';
+                    break;
+                case 'ready':
+                    estimatedMinutesElement.textContent = '0';
+                    break;
+                case 'completed':
+                    estimatedMinutesElement.textContent = '0';
+                    break;
+                default:
+                    estimatedMinutesElement.textContent = '5-10';
+            }
+        }
+        
+        // Update progress tracker
+        updateProgressTracker(orderData.status);
+        
+        // Update order items
+        const trackingOrderItemsElement = document.getElementById('tracking-order-items');
+        if (trackingOrderItemsElement) {
+            // Clear container
+            trackingOrderItemsElement.innerHTML = '';
+            
+            // Add order items
+            orderData.items.forEach(item => {
+                const orderItemElement = document.createElement('div');
+                orderItemElement.className = 'order-item';
+                
+                // Calculate item total
+                let itemTotal = item.price * item.quantity;
+                
+                // Add addon prices if any
+                if (item.addons && item.addons.length > 0) {
+                    item.addons.forEach(addon => {
+                        itemTotal += addon.price;
+                    });
+                }
+                
+                // Create item HTML
+                orderItemElement.innerHTML = `
+                    <div class="item-quantity">${item.quantity}x</div>
+                    <div class="item-details">
+                        <div class="item-name">${item.name}</div>
+                        ${item.addons && item.addons.length > 0 ? `
+                            <div class="item-addons">
+                                ${item.addons.map(addon => `
+                                    <div class="item-addon">${addon.name} (+₱${addon.price.toFixed(2)})</div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="item-price">₱${itemTotal.toFixed(2)}</div>
+                `;
+                
+                // Add to container
+                trackingOrderItemsElement.appendChild(orderItemElement);
+            });
+        }
+        
+        // Update order details
+        const orderDateElement = document.getElementById('order-date');
+        if (orderDateElement) {
+            const orderDate = new Date(orderData.date);
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            orderDateElement.textContent = orderDate.toLocaleDateString('en-US', options);
+        }
+        
+        const paymentMethodElement = document.getElementById('payment-method');
+        if (paymentMethodElement) {
+            paymentMethodElement.textContent = orderData.paymentMethod;
+        }
+        
+        const pickupMethodElement = document.getElementById('pickup-method');
+        if (pickupMethodElement) {
+            pickupMethodElement.textContent = orderData.pickupMethod;
+        }
+        
+        const orderNoteElement = document.getElementById('order-note');
+        const noteRowElement = document.getElementById('note-row');
+        if (orderNoteElement && noteRowElement) {
+            if (orderData.note && orderData.note.trim() !== '') {
+                orderNoteElement.textContent = orderData.note;
+                noteRowElement.style.display = 'flex';
+            } else {
+                noteRowElement.style.display = 'none';
+            }
+        }
+        
+        const orderTotalElement = document.getElementById('order-total');
+        if (orderTotalElement) {
+            orderTotalElement.textContent = `₱${orderData.total.toFixed(2)}`;
+        }
+    }
+    
+    // Function to update progress tracker
+    function updateProgressTracker(status) {
+        // Get step elements
+        const step1 = document.getElementById('step-1');
+        const step2 = document.getElementById('step-2');
+        const step3 = document.getElementById('step-3');
+        const step4 = document.getElementById('step-4');
+        
+        // Reset all steps
+        if (step1) step1.className = 'step';
+        if (step2) step2.className = 'step';
+        if (step3) step3.className = 'step';
+        if (step4) step4.className = 'step';
+        
+        // Update steps based on status
+        switch (status.toLowerCase()) {
+            case 'pending':
+                if (step1) step1.className = 'step active';
+                break;
+            case 'preparing':
+                if (step1) step1.className = 'step completed';
+                if (step2) step2.className = 'step active';
+                break;
+            case 'ready':
+                if (step1) step1.className = 'step completed';
+                if (step2) step2.className = 'step completed';
+                if (step3) step3.className = 'step active';
+                break;
+            case 'completed':
+                if (step1) step1.className = 'step completed';
+                if (step2) step2.className = 'step completed';
+                if (step3) step3.className = 'step completed';
+                if (step4) step4.className = 'step active';
+                break;
+            default:
+                if (step1) step1.className = 'step active';
+        }
+    }
+    
+    // Function to simulate order progress
+    function simulateOrderProgress() {
+        // This is just for demo purposes
+        // In a real app, this would be updated via websockets or polling
+        
+        // Simulate order progress after 10 seconds
+        setTimeout(() => {
+            const orderStatusElement = document.getElementById('order-status');
+            const estimatedMinutesElement = document.getElementById('estimated-minutes');
+            
+            if (orderStatusElement && orderStatusElement.textContent === 'Preparing') {
+                // Update status to Ready
+                orderStatusElement.textContent = 'Ready';
+                
+                // Update estimated time
+                if (estimatedMinutesElement) {
+                    estimatedMinutesElement.textContent = '0';
+                }
+                
+                // Update progress tracker
+                updateProgressTracker('Ready');
+                
+                // Update order in localStorage
+                try {
+                    const currentOrder = localStorage.getItem('currentOrder');
+                    if (currentOrder) {
+                        const orderData = JSON.parse(currentOrder);
+                        orderData.status = 'Ready';
+                        localStorage.setItem('currentOrder', JSON.stringify(orderData));
+                    }
+                } catch (error) {
+                    console.error('Error updating order status:', error);
+                }
+            }
+        }, 10000);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders - Golden Bites</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #333;
+        }
+
+        .container {
+            max-width: 430px;
+            margin: 0 auto;
+            background-color: white;
+            min-height: 100vh;
+            position: relative;
+            padding: 1rem;
+            border-radius: 1rem;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            z-index: 100;
+            margin-bottom: 20px;
+        }
+
+        .back-icon {
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .centered-shop-name {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .logo {
+            width: 35px;
+            height: 35px;
+        }
+
+        /* Food List Link */
+        .food-list-link {
+            display: inline-block;
+            margin: 0 20px 20px;
+            color: #4a7bca;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        /* Orders Header */
+        .orders-header {
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+
+        .orders-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .orders-subtitle {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Order Tabs */
+        .order-tabs {
+            display: flex;
+            overflow-x: auto;
+            gap: 10px;
+            margin: 0 20px 20px;
+            padding-bottom: 5px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .order-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .order-tab {
+            padding: 8px 15px;
+            font-size: 14px;
+            color: #999;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .order-tab.active {
+            color: #0047ab;
+            border-bottom: 2px solid #0047ab;
+            font-weight: 500;
+        }
+
+        .count-badge {
+            display: inline-block;
+            background-color: #0047ab;
+            color: white;
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 5px;
+        }
+
+        /* Orders List */
+        .orders-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 0 20px 70px;
+        }
+
+        .order-item {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 15px;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .order-id {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .order-status {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .status-pending {
+            background-color: #fff8e1;
+            color: #f57c00;
+        }
+
+        .status-preparing {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-ready {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .status-completed {
+            background-color: #f5f5f5;
+            color: #616161;
+        }
+
+        .status-cancelled {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+
+        .order-details {
+            margin-bottom: 10px;
+        }
+
+        .order-time, .order-items, .order-total {
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #666;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: #0047ab;
+            color: white;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid #0047ab;
+            color: #0047ab;
+        }
+
+        .btn-danger {
+            background-color: #ff4d4f;
+            color: white;
+        }
+
+        /* No Items */
+        .no-items {
+            text-align: center;
+            padding: 30px;
+            color: #888;
+            font-size: 14px;
+        }
+
+        /* Navigation Bar */
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 425px;
+            margin: 0 auto;
+            padding: 10px 10px;
+            z-index: 100;
+            border-radius: 1rem;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            color: #888;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+
+        .nav-item.active {
+            color: #0047ab;
+        }
+
+        .add-button {
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-top: -25px;
+            font-size: 24px;
+            color: #0a2463;
+            cursor: pointer;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 0;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .user-info-section {
+            margin-bottom: 30px;
+        }
+
+        .user-info-section h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .user-info-item {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .user-info-item label {
+            font-weight: 500;
+            width: 100px;
+        }
+
+        .logout-container {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .orders-title {
+                font-size: 20px;
+            }
+            
+            .order-tabs {
+                margin: 0 15px 15px;
+            }
+            
+            .orders-list {
+                padding: 0 15px 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="back-icon" id="back-icon">&#8592;</div>
+            <h1 class="centered-shop-name" id="shopNameHeading">Golden Bites Shop</h1>
+            <div class="logo">
+                 <img src="assets/logo.png" class="logo" onerror="this.src='https://via.placeholder.com/35'">
+            </div>
+        </div>
+
+        <!-- Food List Link -->
+        <a href="food-list.html" class="food-list-link" id="food-list-link">Food List</a>
+
+        <!-- Orders Header -->
+        <div class="orders-header">
+            <div class="orders-title" id="pendingOrdersCount">1</div>
+            <div class="orders-subtitle" id="pendingOrdersSubtitle">1 Pending Order</div>
+        </div>
+
+        <!-- Order Tabs -->
+        <div class="order-tabs">
+            <div class="order-tab active" data-status="pending">Pending <span class="count-badge" id="pendingBadge">1</span></div>
+            <div class="order-tab" data-status="preparing">Preparing <span class="count-badge" id="preparingBadge">1</span></div>
+            <div class="order-tab" data-status="ready">Ready <span class="count-badge" id="readyBadge">1</span></div>
+            <div class="order-tab" data-status="completed">Completed</div>
+            <div class="order-tab" data-status="cancelled">Cancelled</div>
+        </div>
+
+        <!-- Orders List -->
+        <div class="orders-list" id="ordersContainer">
+            <!-- Orders will be loaded here -->
+            <div class="no-items" id="noOrdersMessage" style="display: none;">No orders yet. Orders will appear here when customers place them.</div>
+        </div>
+
+        <!-- Navigation Bar -->
+        <div class="nav-bar">
+            <div class="nav-item" id="homeNav">
+                <div class="nav-icon">🏠</div>
+                <div>Home</div>
+            </div>
+            <div class="nav-item active" id="ordersNav">
+                <div class="nav-icon">📋</div>
+                <div>Orders</div>
+            </div>
+            <div class="add-button" id="addButton">+</div>
+            <div class="nav-item" id="summaryNav">
+                <div class="nav-icon">📊</div>
+                <div>Summary</div>
+            </div>
+            <div class="nav-item" id="salesReportNav">
+                <div class="nav-icon">📈</div>
+                <div>Sales Report</div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div class="modal" id="settingsModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Settings</h2>
+                    <span class="close-modal" id="closeModal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="user-info-section">
+                        <h3>User Information</h3>
+                        <div class="user-info-item">
+                            <label>Name:</label>
+                            <span id="userName">John Doe</span>
+                        </div>
+                        <div class="user-info-item">
+                            <label>Shop Name:</label>
+                            <span id="userShopName">Golden Bites Shop</span>
+                        </div>
+                        <div class="user-info-item">
+                            <label>Email:</label>
+                            <span id="userEmail">john@example.com</span>
+                        </div>
+                        <div class="user-info-item">
+                            <label>Phone:</label>
+                            <span id="userPhone">+1234567890</span>
+                        </div>
+                        <!-- Working date will be added here by JavaScript -->
+                    </div>
+                    <div class="logout-container">
+                        <button class="btn btn-danger" id="logoutBtn">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize with default data
+            // No need to check authentication for demo purposes
+            
+            // Set shop name
+            const shopNameHeading = document.getElementById('shopNameHeading');
+            if (shopNameHeading) {
+                shopNameHeading.textContent = "Golden Bites Shop";
+            }
+            
+            // Load orders
+            loadOrders('pending');
+            
+            // Add event listeners to order tabs
+            const orderTabs = document.querySelectorAll('.order-tab');
+            orderTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    orderTabs.forEach(t => t.classList.remove('active'));
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    // Load orders for selected status
+                    const status = this.getAttribute('data-status');
+                    loadOrders(status);
+                });
+            });
+            
+            // Add event listeners to navigation items
+            const homeNav = document.getElementById('homeNav');
+            const ordersNav = document.getElementById('ordersNav');
+            const summaryNav = document.getElementById('summaryNav');
+            const salesReportNav = document.getElementById('salesReportNav');
+            const addButton = document.getElementById('addButton');
+            
+            if (homeNav) {
+                homeNav.addEventListener('click', function() {
+                    window.location.href = 'dashboard.html';
+                });
+            }
+            
+            if (summaryNav) {
+                summaryNav.addEventListener('click', function() {
+                    window.location.href = 'overview-nNYWkIfOxf0sTbvlK1EKfZnyJO3GVz.html';
+                });
+            }
+            
+            if (salesReportNav) {
+                salesReportNav.addEventListener('click', function() {
+                    window.location.href = 'order-summary-SEBosq6Q2uugUTagPEH0I1Y5pTFzyk.html';
+                });
+            }
+            
+            if (addButton) {
+                addButton.addEventListener('click', function() {
+                    window.location.href = 'add-item.html';
+                });
+            }
+            
+            // Add event listener to food list link
+            const foodListLink = document.getElementById('food-list-link');
+            if (foodListLink) {
+                foodListLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = 'food-list.html';
+                });
+            }
+            
+            // Add event listener to back icon
+            const backIcon = document.getElementById('back-icon');
+            if (backIcon) {
+                backIcon.addEventListener('click', function() {
+                    window.history.back();
+                });
+            }
+            
+            // Add event listener to settings modal close button
+            const closeModal = document.getElementById('closeModal');
+            if (closeModal) {
+                closeModal.addEventListener('click', function() {
+                    document.getElementById('settingsModal').style.display = 'none';
+                });
+            }
+            
+            // Add event listener to logout button
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    // Clear user data from localStorage
+                    localStorage.removeItem('currentUser');
+                    // Redirect to login page
+                    window.location.href = 'login-3bp1CbmHBVe2s0PKAR6Csor9AAJLRA.html';
+                });
+            }
+        });
+        
+        // Function to load orders
+        function loadOrders(status) {
+            // In a real app, this would fetch orders from a server
+            // For demo purposes, we'll use mock data
+            
+            // Generate mock orders
+            const mockOrders = generateMockOrders();
+            
+            // Filter orders by status
+            const filteredOrders = mockOrders.filter(order => order.status.toLowerCase() === status);
+            
+            // Update order counts
+            updateOrderCounts(mockOrders);
+            
+            // Update orders container
+            const ordersContainer = document.getElementById('ordersContainer');
+            const noOrdersMessage = document.getElementById('noOrdersMessage');
+            
+            if (!ordersContainer) return;
+            
+            // Clear container
+            ordersContainer.innerHTML = '';
+            
+            // Show no orders message if no orders
+            if (filteredOrders.length === 0) {
+                if (noOrdersMessage) {
+                    noOrdersMessage.style.display = 'block';
+                    ordersContainer.appendChild(noOrdersMessage);
+                }
+                return;
+            }
+            
+            // Hide no orders message
+            if (noOrdersMessage) {
+                noOrdersMessage.style.display = 'none';
+            }
+            
+            // Add orders to container
+            filteredOrders.forEach(order => {
+                const orderElement = createOrderElement(order);
+                ordersContainer.appendChild(orderElement);
+            });
+        }
+        
+        // Function to generate mock orders
+        function generateMockOrders() {
+            return [
+                {
+                    id: 'S3700',
+                    status: 'pending',
+                    time: '10:30 AM',
+                    items: ['Pancake x2', 'Coffee x1'],
+                    total: 120
+                },
+                {
+                    id: 'S3701',
+                    status: 'preparing',
+                    time: '10:15 AM',
+                    items: ['Adobo x1', 'Rice x2'],
+                    total: 150
+                },
+                {
+                    id: 'S3702',
+                    status: 'ready',
+                    time: '10:00 AM',
+                    items: ['Spaghetti x1', 'Garlic Bread x1'],
+                    total: 180
+                },
+                {
+                    id: 'S3698',
+                    status: 'completed',
+                    time: '9:45 AM',
+                    items: ['Pancake x1', 'Orange Juice x1'],
+                    total: 95
+                },
+                {
+                    id: 'S3699',
+                    status: 'cancelled',
+                    time: '9:30 AM',
+                    items: ['Fried Chicken x2'],
+                    total: 220
+                }
+            ];
+        }
+        
+        // Function to update order counts
+        function updateOrderCounts(orders) {
+            // Count orders by status
+            const counts = {
+                pending: 0,
+                preparing: 0,
+                ready: 0,
+                completed: 0,
+                cancelled: 0
+            };
+            
+            orders.forEach(order => {
+                const status = order.status.toLowerCase();
+                if (counts[status] !== undefined) {
+                    counts[status]++;
+                }
+            });
+            
+            // Update pending orders count
+            const pendingOrdersCount = document.getElementById('pendingOrdersCount');
+            if (pendingOrdersCount) {
+                pendingOrdersCount.textContent = counts.pending;
+            }
+            
+            // Update pending orders subtitle
+            const pendingOrdersSubtitle = document.getElementById('pendingOrdersSubtitle');
+            if (pendingOrdersSubtitle) {
+                pendingOrdersSubtitle.textContent = `${counts.pending} Pending Order${counts.pending !== 1 ? 's' : ''}`;
+            }
+            
+            // Update badges
+            const pendingBadge = document.getElementById('pendingBadge');
+            if (pendingBadge) {
+                pendingBadge.textContent = counts.pending;
+            }
+            
+            const preparingBadge = document.getElementById('preparingBadge');
+            if (preparingBadge) {
+                preparingBadge.textContent = counts.preparing;
+            }
+            
+            const readyBadge = document.getElementById('readyBadge');
+            if (readyBadge) {
+                readyBadge.textContent = counts.ready;
+            }
+        }
+        
+        // Function to create order element
+        function createOrderElement(order) {
+            const orderElement = document.createElement('div');
+            orderElement.className = 'order-item';
+            
+            // Create order HTML
+            orderElement.innerHTML = `
+                <div class="order-header">
+                    <div class="order-id">Order #${order.id}</div>
+                    <div class="order-status status-${order.status.toLowerCase()}">${order.status}</div>
+                </div>
+                <div class="order-details">
+                    <div class="order-time">Time: ${order.time}</div>
+                    <div class="order-items">Items: ${order.items.join(', ')}</div>
+                    <div class="order-total">Total: ₱${order.total.toFixed(2)}</div>
+                </div>
+                <div class="order-actions">
+                    ${getOrderActions(order.status)}
+                </div>
+            `;
+            
+            // Add event listeners to action buttons
+            setTimeout(() => {
+                const actionButtons = orderElement.querySelectorAll('.btn');
+                actionButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const action = this.getAttribute('data-action');
+                        const orderId = order.id;
+                        handleOrderAction(action, orderId);
+                    });
+                });
+            }, 0);
+            
+            return orderElement;
+        }
+        
+        // Function to get order actions based on status
+        function getOrderActions(status) {
+            switch (status.toLowerCase()) {
+                case 'pending':
+                    return `
+                        <button class="btn btn-primary" data-action="accept">Accept</button>
+                        <button class="btn btn-outline" data-action="view">View Details</button>
+                        <button class="btn btn-danger" data-action="cancel">Cancel</button>
+                    `;
+                case 'preparing':
+                    return `
+                        <button class="btn btn-primary" data-action="ready">Mark as Ready</button>
+                        <button class="btn btn-outline" data-action="view">View Details</button>
+                    `;
+                case 'ready':
+                    return `
+                        <button class="btn btn-primary" data-action="complete">Mark as Completed</button>
+                        <button class="btn btn-outline" data-action="view">View Details</button>
+                    `;
+                case 'completed':
+                case 'cancelled':
+                    return `
+                        <button class="btn btn-outline" data-action="view">View Details</button>
+                    `;
+                default:
+                    return '';
+            }
+        }
+        
+        // Function to handle order actions
+        function handleOrderAction(action, orderId) {
+            switch (action) {
+                case 'accept':
+                    alert(`Order #${orderId} accepted and moved to Preparing`);
+                    loadOrders('pending');
+                    break;
+                case 'ready':
+                    alert(`Order #${orderId} marked as Ready for Pickup`);
+                    loadOrders('preparing');
+                    break;
+                case 'complete':
+                    alert(`Order #${orderId} marked as Completed`);
+                    loadOrders('ready');
+                    break;
+                case 'cancel':
+                    if (confirm(`Are you sure you want to cancel Order #${orderId}?`)) {
+                        alert(`Order #${orderId} cancelled`);
+                        loadOrders('pending');
+                    }
+                    break;
+                case 'view':
+                    alert(`View details for Order #${orderId}`);
+                    // In a real app, this would open a modal or navigate to an order details page
+                    break;
+                default:
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>

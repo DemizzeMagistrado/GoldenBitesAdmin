@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golden Bites - Welcome</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Styles remain unchanged */
+    </style>
+</head>
+<body>
+    <div class="container welcome-container">
+        <div class="logo-container">
+            <img src="{% static 'img/logo.png' %}" alt="Golden Bites Logo" class="logo-welcome">
+        </div>
+
+        <div class="welcome-buttons">
+            <a href="{% url 'landing' %}" class="login-link">
+                <button class="btn btn-primary">Let's get started</button>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Script remains unchanged
+    </script>
+</body>
+</html>

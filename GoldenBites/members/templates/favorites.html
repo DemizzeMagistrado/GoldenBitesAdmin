@@ -1,0 +1,738 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golden Bites - Favorites</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* styles.css content starts here */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* App Layout */
+        .app-layout {
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            min-height: 100vh;
+            background-color: #fff;
+            border-left: 1px solid #ccc;
+            border-right: 1px solid #ccc;
+            margin: 0 auto;
+            max-width: 600px;
+        }
+
+        /* Main Header */
+        .main-header {
+            position: sticky;
+            top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            z-index: 100;
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-left{
+            color: #4a7bca;
+        }
+
+        .header-center {
+            flex: 1;
+            text-align: center;
+        }
+
+        .header-center h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .header-subtitle {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .menu-icon, .back-btn {
+            font-size: 20px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        a.back-btn{
+            color: #4a7bca;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            width: 100%;
+        }
+
+        /* Favorites Header */
+        .favorites-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .favorites-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .favorites-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .action-btn {
+            background-color: #f5f5f5;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            color: #555;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .action-btn.primary {
+            background-color: #4a7bca;
+            color: white;
+        }
+
+        /* Favorites Filter */
+        .favorites-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .filter-btn {
+            background-color: #f5f5f5;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            color: #555;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn.active {
+            background-color: #4a7bca;
+            color: white;
+        }
+
+        /* Favorites Grid */
+        .favorites-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .favorite-item {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .favorite-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .favorite-img-container {
+            position: relative;
+            height: 140px;
+            overflow: hidden;
+        }
+
+        .favorite-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .favorite-item:hover .favorite-img {
+            transform: scale(1.05);
+        }
+
+        .favorite-category {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-size: 0.7rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .favorite-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .favorite-action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            color: #555;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .favorite-action-btn:hover {
+            background-color: white;
+            transform: scale(1.1);
+        }
+
+        .favorite-action-btn.remove {
+            color: #ff6b6b;
+        }
+
+        .favorite-action-btn.cart {
+            color: #28c76f;
+        }
+
+        .favorite-info {
+            padding: 12px;
+        }
+
+        .favorite-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 1rem;
+            text-decoration: none;
+        }
+
+        .favorite-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .favorite-rating {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .favorite-star {
+            color: #ffcc00;
+        }
+
+        .favorite-price {
+            font-weight: 600;
+            color: #4a7bca;
+            font-size: 0.9rem;
+        }
+
+        /* Empty State */
+        .empty-favorites {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            text-align: center;
+            color: #888;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            color: #ddd;
+            margin-bottom: 15px;
+        }
+
+        .empty-text {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .empty-subtext {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            background-color: white;
+            border-top: 1px solid #eee;
+            position: sticky;
+            bottom: 0;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            color: #666;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-item.active {
+            color: #4a7bca;
+        }
+
+        .nav-icon {
+            margin-bottom: 5px;
+            font-size: 20px;
+        }
+
+        /* Custom Modal */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .popup-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .popup-content {
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            width: 85%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .popup-overlay.active .popup-content {
+            transform: translateY(0);
+        }
+
+        .popup-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background-color: #ff6b6b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-icon i {
+            color: white;
+            font-size: 40px;
+        }
+
+        .popup-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .popup-message {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .popup-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .popup-btn {
+            padding: 14px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: block;
+        }
+
+        .popup-btn-primary {
+            background-color: #4a7bca;
+            color: white;
+            border: none;
+        }
+
+        .popup-btn-primary:hover {
+            background-color: #3f69ae;
+        }
+
+        .popup-btn-secondary {
+            background-color: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .popup-btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .favorites-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 15px;
+            }
+            
+            .favorites-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .favorites-actions {
+                gap: 8px;
+            }
+            
+            .action-btn {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <header class="main-header">
+            <div class="header-center">
+                <h1>Golden Bites</h1>
+            </div>
+            <div class="header-right">
+            </div>
+        </header>
+        
+        <main class="main-content">
+            <div class="favorites-header">
+                <div class="favorites-title">My Favorites</div>
+                <div class="favorites-actions">
+                    <button class="action-btn" id="edit-favorites"><i class="fas fa-edit"></i> Edit</button>
+                </div>
+            </div>
+            
+            <div class="favorites-filter">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="breakfast">Breakfast</button>
+                <button class="filter-btn" data-filter="lunch">Lunch</button>
+                <button class="filter-btn" data-filter="dinner">Dinner</button>
+                <button class="filter-btn" data-filter="dessert">Dessert</button>
+            </div>
+            
+            <div class="favorites-grid" id="favorites-grid">
+                <div class="favorite-item" data-category="breakfast">
+                    <div class="favorite-img-container">
+                        <img src="{% static 'img/pancake.jpg' %}" alt="Pancake" class="favorite-img">
+                        <div class="favorite-category">Breakfast</div>
+                        <div class="favorite-actions">
+                            <button class="favorite-action-btn remove" data-id="pancake">
+                                <i class="fas fa-heart-broken"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="favorite-info">
+                        <a href="{% url 'product_detail' %}?id=pancake" class="favorite-name">Pancake</a>
+                        <div class="favorite-details">
+                            <div class="favorite-rating">
+                                <span class="favorite-star">⭐</span>
+                                <span>4.5</span>
+                            </div>
+                            <div class="favorite-price">₱ 20.00</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="favorite-item" data-category="breakfast">
+                    <div class="favorite-img-container">
+                        <img src="{% static 'img/waffle.jpg' %}" alt="Waffle" class="favorite-img">
+                        <div class="favorite-category">Breakfast</div>
+                        <div class="favorite-actions">
+                            <button class="favorite-action-btn remove" data-id="waffle">
+                                <i class="fas fa-heart-broken"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="favorite-info">
+                        <a href="{% url 'product_detail' %}?id=waffle" class="favorite-name">Waffle</a>
+                        <div class="favorite-details">
+                            <div class="favorite-rating">
+                                <span class="favorite-star">⭐</span>
+                                <span>3.8</span>
+                            </div>
+                            <div class="favorite-price">₱ 20.00</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="favorite-item" data-category="lunch">
+                    <div class="favorite-img-container">
+                        <img src="{% static 'img/adobo.png' %}" alt="Adobo" class="favorite-img">
+                        <div class="favorite-category">Lunch</div>
+                        <div class="favorite-actions">
+                            <button class="favorite-action-btn remove" data-id="adobo">
+                                <i class="fas fa-heart-broken"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="favorite-info">
+                        <a href="{% url 'product_detail' %}?id=adobo" class="favorite-name">Adobo</a>
+                        <div class="favorite-details">
+                            <div class="favorite-rating">
+                                <span class="favorite-star">⭐</span>
+                                <span>4.2</span>
+                            </div>
+                            <div class="favorite-price">₱ 75.00</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="favorite-item" data-category="dessert">
+                    <div class="favorite-img-container">
+                        <img src="{% static 'img/turon.jpg' %}" alt="Turon" class="favorite-img">
+                        <div class="favorite-category">Dessert</div>
+                        <div class="favorite-actions">
+                            <button class="favorite-action-btn remove" data-id="turon">
+                                <i class="fas fa-heart-broken"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="favorite-info">
+                        <a href="{% url 'product_detail' %}?id=turon" class="favorite-name">Turon</a>
+                        <div class="favorite-details">
+                            <div class="favorite-rating">
+                                <span class="favorite-star">⭐</span>
+                                <span>4.3</span>
+                            </div>
+                            <div class="favorite-price">₱ 15.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="empty-favorites" id="empty-favorites" style="display: none;">
+                <div class="empty-icon">
+                    <i class="far fa-heart"></i>
+                </div>
+                <div class="empty-text">No favorites yet</div>
+                <div class="empty-subtext">Items you favorite will appear here</div>
+                <a href="{% url 'home' %}" class="action-btn primary">Browse Menu</a>
+            </div>
+        </main>
+        
+        <nav class="bottom-nav">
+            <a href="{% url 'home' %}" class="nav-item">
+                <div class="nav-icon">🏠</div>
+                <span>Home</span>
+            </a>
+            <a href="{% url 'order_details' %}" class="nav-item">
+                <div class="nav-icon">🛒</div>
+                <span>Cart</span>
+            </a>
+            <a href="{% url 'favorites' %}" class="nav-item active">
+                <div class="nav-icon">❤️</div>
+                <span>Favorites</span>
+            </a>
+            <a href="{% url 'notifications' %}" class="nav-item">
+                <div class="nav-icon">🔔</div>
+                <span>Notifications</span>
+            </a>
+        </nav>
+    </div>
+
+    <div id="custom-confirm-modal" class="popup-overlay">
+        <div class="popup-content">
+            <div class="popup-icon">
+                <i class="fas fa-question"></i>
+            </div>
+            <div class="popup-title">Confirm Action</div>
+            <div class="popup-message" id="confirm-message">Are you sure you want to proceed?</div>
+            <div class="popup-buttons">
+                <button class="popup-btn popup-btn-primary" id="confirm-yes">Yes</button>
+                <button class="popup-btn popup-btn-secondary" id="confirm-no">No</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Custom modal functions
+        function showCustomConfirm(message) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('custom-confirm-modal');
+                const confirmMessage = document.getElementById('confirm-message');
+                const confirmYes = document.getElementById('confirm-yes');
+                const confirmNo = document.getElementById('confirm-no');
+
+                confirmMessage.textContent = message;
+                modal.classList.add('active');
+
+                const handleYes = () => {
+                    modal.classList.remove('active');
+                    confirmYes.removeEventListener('click', handleYes);
+                    confirmNo.removeEventListener('click', handleNo);
+                    resolve(true);
+                };
+
+                const handleNo = () => {
+                    modal.classList.remove('active');
+                    confirmYes.removeEventListener('click', handleYes);
+                    confirmNo.removeEventListener('click', handleNo);
+                    resolve(false);
+                };
+
+                confirmYes.addEventListener('click', handleYes);
+                confirmNo.addEventListener('click', handleNo);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const favoritesGrid = document.getElementById('favorites-grid');
+            const emptyFavorites = document.getElementById('empty-favorites');
+            const editButton = document.getElementById('edit-favorites');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const removeButtons = document.querySelectorAll('.favorite-action-btn.remove');
+
+            // Filter functionality
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const filter = this.getAttribute('data-filter');
+                    const favoriteItems = document.querySelectorAll('.favorite-item');
+                    let visibleCount = 0;
+
+                    favoriteItems.forEach(item => {
+                        if (filter === 'all' || item.getAttribute('data-category') === filter) {
+                            item.style.display = 'block';
+                            visibleCount++;
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+
+                    if (visibleCount === 0) {
+                        favoritesGrid.style.display = 'none';
+                        emptyFavorites.style.display = 'flex';
+                    } else {
+                        favoritesGrid.style.display = 'grid';
+                        emptyFavorites.style.display = 'none';
+                    }
+                });
+            });
+
+            // Remove functionality
+            removeButtons.forEach(button => {
+                button.addEventListener('click', async function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const confirmed = await showCustomConfirm('Remove this item from your favorites?');
+                    if (confirmed) {
+                        const favoriteItem = this.closest('.favorite-item');
+                        favoriteItem.style.opacity = '0';
+                        favoriteItem.style.transform = 'scale(0.8)';
+
+                        setTimeout(() => {
+                            favoriteItem.remove();
+                            const remainingFavorites = document.querySelectorAll('.favorite-item');
+                            if (remainingFavorites.length === 0) {
+                                favoritesGrid.style.display = 'none';
+                                emptyFavorites.style.display = 'flex';
+                            }
+                        }, 300);
+                    }
+                });
+            });
+
+            // Edit mode
+            if (editButton) {
+                editButton.addEventListener('click', function() {
+                    const isEditing = favoritesGrid.classList.toggle('editing');
+                    this.innerHTML = isEditing ? 
+                        '<i class="fas fa-check"></i> Done' : 
+                        '<i class="fas fa-edit"></i> Edit';
+
+                    removeButtons.forEach(btn => {
+                        btn.style.display = isEditing ? 'flex' : 'none';
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

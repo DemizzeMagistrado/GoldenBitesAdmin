@@ -1,0 +1,234 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golden Bites - Welcome</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #333;
+        }
+
+        /* Container */
+        .container {
+            max-width: 430px;
+            margin: 0 auto;
+            background-color: white;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Welcome Container */
+        .welcome-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 60px 30px 40px;
+            background: linear-gradient(to bottom, #ffffff, #f8f9fa);
+        }
+
+        /* Logo Container */
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .logo-welcome {
+            width: 180px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        /* Welcome Buttons */
+        .welcome-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            animation: fadeIn 1s ease-out 0.3s forwards;
+            opacity: 0;
+        }
+
+        /* Button */
+        .btn {
+            display: block;
+            width: 100%;
+            height: 50px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none; /* To remove underline from the link */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-primary {
+            background-color: #4a7bca;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #3a6cb8;
+        }
+
+        /* Login Link */
+        .login-link {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #4a7bca;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 10px;
+        }
+
+        .login-link:hover {
+            text-decoration: underline;
+        }
+
+        .login-icon {
+            margin-left: 5px;
+            font-size: 12px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .welcome-container {
+                padding: 40px 20px 30px;
+            }
+
+            .logo-welcome {
+                width: 150px;
+            }
+
+            .btn {
+                height: 46px;
+                font-size: 15px;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container welcome-container">
+        <div class="logo-container">
+            <img src="{% static 'img/logo.png' %}" alt="Golden Bites Logo" class="logo-welcome">
+        </div>
+
+        <div class="welcome-buttons">
+            <a href="{% url 'landing' %}" class="login-link">
+                <button class="btn btn-primary">Let's get started</button>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Data storage using localStorage
+        const FOOD_ITEMS_KEY = "goldenBites_foodItems";
+        const ORDERS_KEY = "goldenBites_orders";
+        const USER_KEY = "goldenBites_user";
+        const SHOP_NAME_KEY = "goldenBites_shopName";
+        const WORKING_DATE_KEY = "goldenBites_workingDate";
+        const REVIEWS_KEY = "goldenBites_reviews";
+        const RESET_TOKENS_KEY = "goldenBites_resetTokens";
+
+        // Initialize data
+        function initializeData() {
+            // Initialize food items if not exists
+            if (!localStorage.getItem(FOOD_ITEMS_KEY)) {
+                localStorage.setItem(FOOD_ITEMS_KEY, JSON.stringify([]));
+            }
+
+            // Initialize orders if not exists
+            if (!localStorage.getItem(ORDERS_KEY)) {
+                localStorage.setItem(ORDERS_KEY, JSON.stringify([]));
+            }
+
+            // Set default shop name if not exists
+            if (!localStorage.getItem(SHOP_NAME_KEY)) {
+                localStorage.setItem(SHOP_NAME_KEY, "Your Shop");
+            }
+
+            // Initialize reviews if not exists
+            if (!localStorage.getItem(REVIEWS_KEY)) {
+                localStorage.setItem(REVIEWS_KEY, JSON.stringify([]));
+            }
+
+            // Initialize reset tokens if not exists
+            if (!localStorage.getItem(RESET_TOKENS_KEY)) {
+                localStorage.setItem(RESET_TOKENS_KEY, JSON.stringify([]));
+            }
+
+            // Set working date to today if not exists
+            if (!localStorage.getItem(WORKING_DATE_KEY)) {
+                const today = new Date().toISOString().split("T")[0];
+                localStorage.setItem(WORKING_DATE_KEY, today);
+            }
+        }
+
+        // Navigation function
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize data
+            initializeData();
+
+            // Check if user is already logged in
+            const currentUser = JSON.parse(localStorage.getItem(USER_KEY));
+            if (currentUser) {
+                // If user is already logged in, you might want to redirect them to the dashboard.
+                // For now, we'll just leave it as is.
+            }
+
+            // Add click event listeners to buttons
+            const getStartedBtn = document.querySelector('.btn-primary');
+
+            // Add hover effect to buttons
+            if (getStartedBtn) {
+                getStartedBtn.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.02)';
+                });
+
+                getStartedBtn.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
