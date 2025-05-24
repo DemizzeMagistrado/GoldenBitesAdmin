@@ -233,7 +233,7 @@
                     <div class="password-input-container">
                         <input type="password" name="password" id="password" class="form-input" placeholder="Enter your password" required>
                         <div class="password-toggle" onclick="togglePasswordVisibility('password', this)">
-                            <img src="{% static 'assets/eye-close.png' %}" alt="Toggle Password" class="eye-icon">
+                            <img src="{% static 'img/eye-close.png' %}" class="eye-icon">
                         </div>
                     </div>
                 </div>
@@ -337,18 +337,18 @@
         function getCurrentUser() {
             return JSON.parse(localStorage.getItem(USER_KEY));
         }
-
+        
         // Toggle password visibility
-        function togglePasswordVisibility(inputId, toggleElement) {
-            const passwordInput = document.getElementById(inputId);
+        function togglePasswordVisibility(fieldId, toggleElement) {
+            const passwordField = document.getElementById(fieldId);
             const eyeIcon = toggleElement.querySelector('.eye-icon');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                eyeIcon.src = "{% static 'assets/eye-open.png' %}"; // Use Django static tag
+
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                eyeIcon.src = "{% static 'img/eye-open.png' %}"; // Assuming you have an eye-open.png
             } else {
-                passwordInput.type = 'password';
-                eyeIcon.src = "{% static 'assets/eye-close.png' %}"; // Use Django static tag
+                passwordField.type = 'password';
+                eyeIcon.src = "{% static 'img/eye-close.png' %}";
             }
         }
 
@@ -394,7 +394,8 @@
                         }
                         
                         // Redirect to dashboard page
-                        window.location.href = "{% url 'dashboard' %}"; // Use Django URL template tag
+                        // Redirect to dashboard page
+                            window.location.href = "{% url 'dashboard' %}"; // Use Django URL template tag
                     } else {
                         showAlert('Login Failed', 'Invalid email or password. Please try again.'); // Replaced alert()
                     }

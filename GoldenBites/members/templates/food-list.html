@@ -1,8 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <title>Food List - Golden Bites</title>
     <style>
         /* Reset and base styles */
@@ -256,7 +259,7 @@
             margin-bottom: 2px;
         }
 
-        .nav-item.active {
+        .nav-item.active, .nav-item:hover{
             color: #0047ab;
         }
 
@@ -304,9 +307,9 @@
         <div class="header">
             <div class="back-icon">&#8592;</div>
             <h1 id="shopNameHeading" class="centered-shop-name">Your Shop</h1>
-            <div class="logo">
-                 <img src="assets/logo.png" class="logo">
-            </div>       
+           <div class="logo">
+                 <img src="{% static 'img/logo.png' %}" class="logo" alt="Logo">
+            </div>
         </div>
         
 
@@ -337,26 +340,28 @@
             <div class="no-items" id="noItemsMessage">No food items found. Click the + button to add items.</div>
         </div>
 
-        <!-- Navigation Bar -->
         <div class="nav-bar">
-            <div class="nav-item" onclick="navigateTo('dashboard.html')">
-                <div class="nav-icon">🏠</div>
+            <div class="nav-item" id="homeNav">
+                <div class="nav-icon"><i class="fa-solid fa-house"></i></div>
                 <div>Home</div>
             </div>
-            <div class="nav-item" onclick="navigateTo('orders.html')">
-                <div class="nav-icon">📋</div>
+             <div class="nav-item active" id="ordersNav">
+                <div class="nav-icon"><i class="fa-solid fa-table-list"></i></div>
                 <div>Orders</div>
             </div>
-            <div class="add-button" onclick="navigateTo('add-item.html')">+</div>
-            <div class="nav-item" onclick="navigateTo('overview.html')">
-                <div class="nav-icon">📊</div>
-                <div>Overview</div>
+            <div class="add-button" id="addButton">
+                +
             </div>
-            <div class="nav-item" onclick="navigateTo('order-summary.html')">
-                <div class="nav-icon">📈</div>
+            <div class="nav-item" id="ordersummaryNav">
+                <div class="nav-icon"><i class="fa-solid fa-file"></i></div>
                 <div>Summary</div>
             </div>
+            <div class="nav-item" id="overviewNav">
+                <div class="nav-icon"><i class="fa-solid fa-chart-simple"></i></div>
+                <div>Sales</div>
+            </div>
         </div>
+
     </div>
 
     <script>
@@ -412,8 +417,33 @@
             
             // Setup back button
             setupBackButton();
+
+            // Setup Navigation
+            setupNavigation();
         }
 
+        //Nav bar
+        function setupNavigation() {
+            document.getElementById('homeNav')?.addEventListener('click', () => {
+                navigateTo('{% url "dashboard" %}');
+            });
+            
+            document.getElementById('ordersNav')?.addEventListener('click', () => {
+                navigateTo('{% url "orders" %}');
+            });
+            
+            document.getElementById('addButton')?.addEventListener('click', () => {
+                navigateTo('{% url "add-item" %}');
+            });
+            
+            document.getElementById('ordersummaryNav')?.addEventListener('click', () => {
+                navigateTo('{% url "overview" %}');
+            });
+            
+            document.getElementById('overviewNav')?.addEventListener('click', () => {
+                navigateTo('{% url "order_summary" %}');
+            });
+        }
         // Display food items by category
         function displayFoodItems(category = "All") {
             const foodItems = JSON.parse(localStorage.getItem(FOOD_ITEMS_KEY)) || [];
@@ -508,7 +538,7 @@
 
         // Edit food item
         function editFoodItem(id) {
-            window.location.href = `add-item.html?edit=${id}`;
+            window.location.href = `{% url "add-item" %}?edit=${id}`; // Use Django URL tag
         }
 
         // Delete food item with confirmation

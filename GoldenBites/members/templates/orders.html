@@ -1,8 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <title>Orders - Golden Bites</title>
     <style>
         /* Reset and base styles */
@@ -277,9 +279,10 @@
             margin-bottom: 2px;
         }
 
-        .nav-item.active {
+        .nav-item.active, .nav-item:hover{
             color: #0047ab;
         }
+
 
         .add-button {
             width: 50px;
@@ -406,25 +409,21 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <div class="back-icon" id="back-icon">&#8592;</div>
-            <h1 class="centered-shop-name" id="shopNameHeading">Golden Bites Shop</h1>
+            <h1 class="centered-shop-name" id="shopNameHeading">Your shop name</h1>
             <div class="logo">
-                 <img src="assets/logo.png" class="logo" onerror="this.src='https://via.placeholder.com/35'">
+                 <img src="{% static 'img/logo.png' %}" class="logo" alt="Logo">
             </div>
         </div>
 
-        <!-- Food List Link -->
-        <a href="food-list.html" class="food-list-link" id="food-list-link">Food List</a>
+        <a href="{% url 'food_list' %}" class="food-list-link" id="food-list-link">Food List</a>
 
-        <!-- Orders Header -->
         <div class="orders-header">
             <div class="orders-title" id="pendingOrdersCount">1</div>
             <div class="orders-subtitle" id="pendingOrdersSubtitle">1 Pending Order</div>
         </div>
 
-        <!-- Order Tabs -->
         <div class="order-tabs">
             <div class="order-tab active" data-status="pending">Pending <span class="count-badge" id="pendingBadge">1</span></div>
             <div class="order-tab" data-status="preparing">Preparing <span class="count-badge" id="preparingBadge">1</span></div>
@@ -433,34 +432,34 @@
             <div class="order-tab" data-status="cancelled">Cancelled</div>
         </div>
 
-        <!-- Orders List -->
         <div class="orders-list" id="ordersContainer">
-            <!-- Orders will be loaded here -->
             <div class="no-items" id="noOrdersMessage" style="display: none;">No orders yet. Orders will appear here when customers place them.</div>
         </div>
 
-        <!-- Navigation Bar -->
+
         <div class="nav-bar">
-            <div class="nav-item" id="homeNav">
-                <div class="nav-icon">🏠</div>
-                <div>Home</div>
-            </div>
-            <div class="nav-item active" id="ordersNav">
-                <div class="nav-icon">📋</div>
-                <div>Orders</div>
-            </div>
-            <div class="add-button" id="addButton">+</div>
-            <div class="nav-item" id="summaryNav">
-                <div class="nav-icon">📊</div>
-                <div>Summary</div>
-            </div>
-            <div class="nav-item" id="salesReportNav">
-                <div class="nav-icon">📈</div>
-                <div>Sales Report</div>
-            </div>
+        <div class="nav-item" id="homeNav">
+            <div class="nav-icon"><i class="fa-solid fa-house"></i></div>
+            <div>Home</div>
+        </div>
+        <div class="nav-item active" id="ordersNav">
+            <div class="nav-icon"><i class="fa-solid fa-table-list"></i></div>
+            <div>Orders</div>
+        </div>
+        <div class="add-button" id="addButton">
+            +
+        </div>
+        <div class="nav-item" id="ordersummaryNav">
+            <div class="nav-icon"><i class="fa-solid fa-file"></i></div>
+            <div>Summary</div>
+        </div>
+        <div class="nav-item" id="overviewNav">
+            <div class="nav-icon"><i class="fa-solid fa-chart-simple"></i></div>
+            <div>Sales</div>
+        </div>
         </div>
 
-        <!-- Settings Modal -->
+
         <div class="modal" id="settingsModal">
             <div class="modal-content">
                 <div class="modal-header">
@@ -486,8 +485,7 @@
                             <label>Phone:</label>
                             <span id="userPhone">+1234567890</span>
                         </div>
-                        <!-- Working date will be added here by JavaScript -->
-                    </div>
+                        </div>
                     <div class="logout-container">
                         <button class="btn btn-danger" id="logoutBtn">Logout</button>
                     </div>
@@ -496,16 +494,43 @@
         </div>
     </div>
 
+   
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize with default data
-            // No need to check authentication for demo purposes
+            // Constants for localStorage keys
+            const USER_KEY = 'goldenBites_user';
+            const SHOP_NAME_KEY = 'goldenBites_shopName';
+            const ALL_ORDERS_KEY = 'goldenBites_allOrders'; // Shared with dashboard
             
-            // Set shop name
-            const shopNameHeading = document.getElementById('shopNameHeading');
-            if (shopNameHeading) {
-                shopNameHeading.textContent = "Golden Bites Shop";
+            function updateShopName() {
+                const shopNameHeading = document.getElementById("shopNameHeading");
+                if (!shopNameHeading) return;
+                
+                // Try to get shop name from localStorage
+                let shopName = localStorage.getItem(SHOP_NAME_KEY) || "Your Shop";
+                
+                // Try to get from user data if not directly available
+                if (!localStorage.getItem(SHOP_NAME_KEY)) {
+                    const userData = localStorage.getItem(USER_KEY);
+                    if (userData) {
+                        try {
+                            const user = JSON.parse(userData);
+                            if (user && user.shopName) {
+                                shopName = user.shopName;
+                                localStorage.setItem(SHOP_NAME_KEY, shopName);
+                            }
+                        } catch (e) {
+                            console.error('Error parsing user data:', e);
+                        }
+                    }
+                }
+                
+                shopNameHeading.textContent = shopName;
+                console.log("Shop name updated to:", shopName);
             }
+            
+            // Call updateShopName to set the shop name
+            updateShopName();
             
             // Load orders
             loadOrders('pending');
@@ -524,300 +549,335 @@
                 });
             });
             
-            // Add event listeners to navigation items
-            const homeNav = document.getElementById('homeNav');
-            const ordersNav = document.getElementById('ordersNav');
-            const summaryNav = document.getElementById('summaryNav');
-            const salesReportNav = document.getElementById('salesReportNav');
-            const addButton = document.getElementById('addButton');
-            
-            if (homeNav) {
-                homeNav.addEventListener('click', function() {
-                    window.location.href = 'dashboard.html';
-                });
-            }
-            
-            if (summaryNav) {
-                summaryNav.addEventListener('click', function() {
-                    window.location.href = 'overview-nNYWkIfOxf0sTbvlK1EKfZnyJO3GVz.html';
-                });
-            }
-            
-            if (salesReportNav) {
-                salesReportNav.addEventListener('click', function() {
-                    window.location.href = 'order-summary-SEBosq6Q2uugUTagPEH0I1Y5pTFzyk.html';
-                });
-            }
-            
-            if (addButton) {
-                addButton.addEventListener('click', function() {
-                    window.location.href = 'add-item.html';
-                });
-            }
-            
-            // Add event listener to food list link
-            const foodListLink = document.getElementById('food-list-link');
-            if (foodListLink) {
-                foodListLink.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    window.location.href = 'food-list.html';
-                });
-            }
-            
-            // Add event listener to back icon
-            const backIcon = document.getElementById('back-icon');
-            if (backIcon) {
-                backIcon.addEventListener('click', function() {
-                    window.history.back();
-                });
-            }
-            
-            // Add event listener to settings modal close button
-            const closeModal = document.getElementById('closeModal');
-            if (closeModal) {
-                closeModal.addEventListener('click', function() {
-                    document.getElementById('settingsModal').style.display = 'none';
-                });
-            }
-            
-            // Add event listener to logout button
-            const logoutBtn = document.getElementById('logoutBtn');
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', function() {
-                    // Clear user data from localStorage
-                    localStorage.removeItem('currentUser');
-                    // Redirect to login page
-                    window.location.href = 'login-3bp1CbmHBVe2s0PKAR6Csor9AAJLRA.html';
-                });
-            }
-        });
-        
-        // Function to load orders
-        function loadOrders(status) {
-            // In a real app, this would fetch orders from a server
-            // For demo purposes, we'll use mock data
-            
-            // Generate mock orders
-            const mockOrders = generateMockOrders();
-            
-            // Filter orders by status
-            const filteredOrders = mockOrders.filter(order => order.status.toLowerCase() === status);
-            
-            // Update order counts
-            updateOrderCounts(mockOrders);
-            
-            // Update orders container
-            const ordersContainer = document.getElementById('ordersContainer');
-            const noOrdersMessage = document.getElementById('noOrdersMessage');
-            
-            if (!ordersContainer) return;
-            
-            // Clear container
-            ordersContainer.innerHTML = '';
-            
-            // Show no orders message if no orders
-            if (filteredOrders.length === 0) {
-                if (noOrdersMessage) {
-                    noOrdersMessage.style.display = 'block';
-                    ordersContainer.appendChild(noOrdersMessage);
-                }
-                return;
-            }
-            
-            // Hide no orders message
-            if (noOrdersMessage) {
-                noOrdersMessage.style.display = 'none';
-            }
-            
-            // Add orders to container
-            filteredOrders.forEach(order => {
-                const orderElement = createOrderElement(order);
-                ordersContainer.appendChild(orderElement);
-            });
-        }
-        
-        // Function to generate mock orders
-        function generateMockOrders() {
-            return [
-                {
-                    id: 'S3700',
-                    status: 'pending',
-                    time: '10:30 AM',
-                    items: ['Pancake x2', 'Coffee x1'],
-                    total: 120
-                },
-                {
-                    id: 'S3701',
-                    status: 'preparing',
-                    time: '10:15 AM',
-                    items: ['Adobo x1', 'Rice x2'],
-                    total: 150
-                },
-                {
-                    id: 'S3702',
-                    status: 'ready',
-                    time: '10:00 AM',
-                    items: ['Spaghetti x1', 'Garlic Bread x1'],
-                    total: 180
-                },
-                {
-                    id: 'S3698',
-                    status: 'completed',
-                    time: '9:45 AM',
-                    items: ['Pancake x1', 'Orange Juice x1'],
-                    total: 95
-                },
-                {
-                    id: 'S3699',
-                    status: 'cancelled',
-                    time: '9:30 AM',
-                    items: ['Fried Chicken x2'],
-                    total: 220
-                }
-            ];
-        }
-        
-        // Function to update order counts
-        function updateOrderCounts(orders) {
-            // Count orders by status
-            const counts = {
-                pending: 0,
-                preparing: 0,
-                ready: 0,
-                completed: 0,
-                cancelled: 0
-            };
-            
-            orders.forEach(order => {
-                const status = order.status.toLowerCase();
-                if (counts[status] !== undefined) {
-                    counts[status]++;
-                }
-            });
-            
-            // Update pending orders count
-            const pendingOrdersCount = document.getElementById('pendingOrdersCount');
-            if (pendingOrdersCount) {
-                pendingOrdersCount.textContent = counts.pending;
-            }
-            
-            // Update pending orders subtitle
-            const pendingOrdersSubtitle = document.getElementById('pendingOrdersSubtitle');
-            if (pendingOrdersSubtitle) {
-                pendingOrdersSubtitle.textContent = `${counts.pending} Pending Order${counts.pending !== 1 ? 's' : ''}`;
-            }
-            
-            // Update badges
-            const pendingBadge = document.getElementById('pendingBadge');
-            if (pendingBadge) {
-                pendingBadge.textContent = counts.pending;
-            }
-            
-            const preparingBadge = document.getElementById('preparingBadge');
-            if (preparingBadge) {
-                preparingBadge.textContent = counts.preparing;
-            }
-            
-            const readyBadge = document.getElementById('readyBadge');
-            if (readyBadge) {
-                readyBadge.textContent = counts.ready;
-            }
-        }
-        
-        // Function to create order element
-        function createOrderElement(order) {
-            const orderElement = document.createElement('div');
-            orderElement.className = 'order-item';
-            
-            // Create order HTML
-            orderElement.innerHTML = `
-                <div class="order-header">
-                    <div class="order-id">Order #${order.id}</div>
-                    <div class="order-status status-${order.status.toLowerCase()}">${order.status}</div>
-                </div>
-                <div class="order-details">
-                    <div class="order-time">Time: ${order.time}</div>
-                    <div class="order-items">Items: ${order.items.join(', ')}</div>
-                    <div class="order-total">Total: ₱${order.total.toFixed(2)}</div>
-                </div>
-                <div class="order-actions">
-                    ${getOrderActions(order.status)}
-                </div>
-            `;
-            
-            // Add event listeners to action buttons
-            setTimeout(() => {
-                const actionButtons = orderElement.querySelectorAll('.btn');
-                actionButtons.forEach(button => {
-                    button.addEventListener('click', function() {
-                        const action = this.getAttribute('data-action');
-                        const orderId = order.id;
-                        handleOrderAction(action, orderId);
+            // Setup navigation
+            function setupNavigation() {
+                // Back button
+                const backButton = document.getElementById('back-icon');
+                if (backButton) {
+                    backButton.addEventListener('click', () => {
+                        window.history.back();
                     });
-                });
-            }, 0);
-            
-            return orderElement;
-        }
-        
-        // Function to get order actions based on status
-        function getOrderActions(status) {
-            switch (status.toLowerCase()) {
-                case 'pending':
-                    return `
-                        <button class="btn btn-primary" data-action="accept">Accept</button>
-                        <button class="btn btn-outline" data-action="view">View Details</button>
-                        <button class="btn btn-danger" data-action="cancel">Cancel</button>
-                    `;
-                case 'preparing':
-                    return `
-                        <button class="btn btn-primary" data-action="ready">Mark as Ready</button>
-                        <button class="btn btn-outline" data-action="view">View Details</button>
-                    `;
-                case 'ready':
-                    return `
-                        <button class="btn btn-primary" data-action="complete">Mark as Completed</button>
-                        <button class="btn btn-outline" data-action="view">View Details</button>
-                    `;
-                case 'completed':
-                case 'cancelled':
-                    return `
-                        <button class="btn btn-outline" data-action="view">View Details</button>
-                    `;
-                default:
-                    return '';
-            }
-        }
-        
-        // Function to handle order actions
-        function handleOrderAction(action, orderId) {
-            switch (action) {
-                case 'accept':
-                    alert(`Order #${orderId} accepted and moved to Preparing`);
-                    loadOrders('pending');
-                    break;
-                case 'ready':
-                    alert(`Order #${orderId} marked as Ready for Pickup`);
-                    loadOrders('preparing');
-                    break;
-                case 'complete':
-                    alert(`Order #${orderId} marked as Completed`);
-                    loadOrders('ready');
-                    break;
-                case 'cancel':
-                    if (confirm(`Are you sure you want to cancel Order #${orderId}?`)) {
-                        alert(`Order #${orderId} cancelled`);
-                        loadOrders('pending');
+                }
+
+                // Navigation mapping
+                const navItems = {
+                    homeNav: "{% url 'dashboard' %}",
+                    ordersNav: "{% url 'orders' %}",
+                    addButton: "{% url 'add-item' %}",
+                    overviewNav: "{% url 'order_summary' %}",
+                    ordersummaryNav: "{% url 'overview' %}"
+                };
+
+                
+                 const currentPath = window.location.pathname;
+                 
+                // Add click listeners with active class logic
+                Object.keys(navItems).forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.addEventListener('click', () => {
+                            // Remove 'active' from all nav-items
+                            document.querySelectorAll('.nav-item').forEach(item => {
+                                item.classList.remove('active');
+                            });
+
+                            // Add 'active' only if it's a nav-item (not addButton)
+                            if (el.classList.contains('nav-item')) {
+                                el.classList.add('active');
+                            }
+
+                            // Navigate
+                            window.location.href = navItems[id];
+                        });
                     }
-                    break;
-                case 'view':
-                    alert(`View details for Order #${orderId}`);
-                    // In a real app, this would open a modal or navigate to an order details page
-                    break;
-                default:
-                    break;
+                });
+
+                // Food list link
+                const foodListLink = document.getElementById('food-list-link');
+                if (foodListLink) {
+                    foodListLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        window.location.href = '{% url "food_list" %}';
+                    });
+                }
+
+                // Settings modal close
+                const closeModal = document.getElementById('closeModal');
+                if (closeModal) {
+                    closeModal.addEventListener('click', function() {
+                        document.getElementById('settingsModal').style.display = 'none';
+                    });
+                }
+
+                // Logout
+                const logoutBtn = document.getElementById('logoutBtn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', function() {
+                        localStorage.removeItem(USER_KEY);
+                        window.location.href = '{% url "login" %}';
+                    });
+                }
             }
-        }
+
+            
+            // Call setupNavigation to set up all navigation event listeners
+            setupNavigation();
+            
+            // Function to load orders
+            function loadOrders(status) {
+                // Get orders from localStorage or use mock data
+                let allOrders = JSON.parse(localStorage.getItem(ALL_ORDERS_KEY));
+                
+                if (!allOrders) {
+                    // Generate mock orders if none exist
+                    allOrders = generateMockOrders();
+                    // Save to localStorage for sharing with dashboard
+                    localStorage.setItem(ALL_ORDERS_KEY, JSON.stringify(allOrders));
+                }
+                
+                // Filter orders by status
+                const filteredOrders = allOrders.filter(order => order.status.toLowerCase() === status);
+                
+                // Update order counts
+                updateOrderCounts(allOrders);
+                
+                // Update orders container
+                const ordersContainer = document.getElementById('ordersContainer');
+                const noOrdersMessage = document.getElementById('noOrdersMessage');
+                
+                if (!ordersContainer) return;
+                
+                // Clear container
+                ordersContainer.innerHTML = '';
+                
+                // Show no orders message if no orders
+                if (filteredOrders.length === 0) {
+                    if (noOrdersMessage) {
+                        noOrdersMessage.style.display = 'block';
+                        ordersContainer.appendChild(noOrdersMessage);
+                    }
+                    return;
+                }
+                
+                // Hide no orders message
+                if (noOrdersMessage) {
+                    noOrdersMessage.style.display = 'none';
+                }
+                
+                // Add orders to container
+                filteredOrders.forEach(order => {
+                    const orderElement = createOrderElement(order);
+                    ordersContainer.appendChild(orderElement);
+                });
+            }
+            
+            // Function to generate mock orders
+            function generateMockOrders() {
+                return [
+                    {
+                        id: 'S3700',
+                        status: 'pending',
+                        time: '10:30 AM',
+                        items: ['Pancake x2', 'Coffee x1'],
+                        total: 120
+                    },
+                    {
+                        id: 'S3701',
+                        status: 'preparing',
+                        time: '10:15 AM',
+                        items: ['Adobo x1', 'Rice x2'],
+                        total: 150
+                    },
+                    {
+                        id: 'S3702',
+                        status: 'ready',
+                        time: '10:00 AM',
+                        items: ['Spaghetti x1', 'Garlic Bread x1'],
+                        total: 180
+                    },
+                    {
+                        id: 'S3698',
+                        status: 'completed',
+                        time: '9:45 AM',
+                        items: ['Pancake x1', 'Orange Juice x1'],
+                        total: 95
+                    },
+                    {
+                        id: 'S3699',
+                        status: 'cancelled',
+                        time: '9:30 AM',
+                        items: ['Fried Chicken x2'],
+                        total: 220
+                    }
+                ];
+            }
+            
+            // Function to update order counts
+            function updateOrderCounts(orders) {
+                // Count orders by status
+                const counts = {
+                    pending: 0,
+                    preparing: 0,
+                    ready: 0,
+                    completed: 0,
+                    cancelled: 0
+                };
+                
+                orders.forEach(order => {
+                    const status = order.status.toLowerCase();
+                    if (counts[status] !== undefined) {
+                        counts[status]++;
+                    }
+                });
+                
+                // Update pending orders count
+                const pendingOrdersCount = document.getElementById('pendingOrdersCount');
+                if (pendingOrdersCount) {
+                    pendingOrdersCount.textContent = counts.pending;
+                }
+                
+                // Update pending orders subtitle
+                const pendingOrdersSubtitle = document.getElementById('pendingOrdersSubtitle');
+                if (pendingOrdersSubtitle) {
+                    pendingOrdersSubtitle.textContent = `${counts.pending} Pending Order${counts.pending !== 1 ? 's' : ''}`;
+                }
+                
+                // Update badges
+                const pendingBadge = document.getElementById('pendingBadge');
+                if (pendingBadge) {
+                    pendingBadge.textContent = counts.pending;
+                }
+                
+                const preparingBadge = document.getElementById('preparingBadge');
+                if (preparingBadge) {
+                    preparingBadge.textContent = counts.preparing;
+                }
+                
+                const readyBadge = document.getElementById('readyBadge');
+                if (readyBadge) {
+                    readyBadge.textContent = counts.ready;
+                }
+            }
+            
+            // Function to create order element
+            function createOrderElement(order) {
+                const orderElement = document.createElement('div');
+                orderElement.className = 'order-item';
+                
+                // Create order HTML
+                orderElement.innerHTML = `
+                    <div class="order-header">
+                        <div class="order-id">Order #${order.id}</div>
+                        <div class="order-status status-${order.status.toLowerCase()}">${order.status}</div>
+                    </div>
+                    <div class="order-details">
+                        <div class="order-time">Time: ${order.time}</div>
+                        <div class="order-items">Items: ${order.items.join(', ')}</div>
+                        <div class="order-total">Total: ₱${order.total.toFixed(2)}</div>
+                    </div>
+                    <div class="order-actions">
+                        ${getOrderActions(order.status)}
+                    </div>
+                `;
+                
+                // Add event listeners to action buttons
+                setTimeout(() => {
+                    const actionButtons = orderElement.querySelectorAll('.btn');
+                    actionButtons.forEach(button => {
+                        button.addEventListener('click', function() {
+                            const action = this.getAttribute('data-action');
+                            const orderId = order.id;
+                            handleOrderAction(action, orderId);
+                        });
+                    });
+                }, 0);
+                
+                return orderElement;
+            }
+            
+            // Function to get order actions based on status
+            function getOrderActions(status) {
+                switch (status.toLowerCase()) {
+                    case 'pending':
+                        return `
+                            <button class="btn btn-primary" data-action="accept">Accept</button>
+                            <button class="btn btn-outline" data-action="view">View Details</button>
+                            <button class="btn btn-danger" data-action="cancel">Cancel</button>
+                        `;
+                    case 'preparing':
+                        return `
+                            <button class="btn btn-primary" data-action="ready">Mark as Ready</button>
+                            <button class="btn btn-outline" data-action="view">View Details</button>
+                        `;
+                    case 'ready':
+                        return `
+                            <button class="btn btn-primary" data-action="complete">Mark as Completed</button>
+                            <button class="btn btn-outline" data-action="view">View Details</button>
+                        `;
+                    case 'completed':
+                    case 'cancelled':
+                        return `
+                            <button class="btn btn-outline" data-action="view">View Details</button>
+                        `;
+                    default:
+                        return '';
+                }
+            }
+            
+            // Function to handle order actions
+            function handleOrderAction(action, orderId) {
+                // Get current orders
+                let allOrders = JSON.parse(localStorage.getItem(ALL_ORDERS_KEY)) || [];
+                
+                // Find the order to update
+                const orderIndex = allOrders.findIndex(order => order.id === orderId);
+                
+                if (orderIndex === -1) return;
+                
+                switch (action) {
+                    case 'accept':
+                        allOrders[orderIndex].status = 'preparing';
+                        alert(`Order #${orderId} accepted and moved to Preparing`);
+                        break;
+                    case 'ready':
+                        allOrders[orderIndex].status = 'ready';
+                        alert(`Order #${orderId} marked as Ready for Pickup`);
+                        break;
+                    case 'complete':
+                        allOrders[orderIndex].status = 'completed';
+                        alert(`Order #${orderId} marked as Completed`);
+                        break;
+                    case 'cancel':
+                        if (confirm(`Are you sure you want to cancel Order #${orderId}?`)) {
+                            allOrders[orderIndex].status = 'cancelled';
+                            alert(`Order #${orderId} cancelled`);
+                        } else {
+                            return; // Don't update if cancelled
+                        }
+                        break;
+                    case 'view':
+                        alert(`View details for Order #${orderId}`);
+                        return; // Don't update orders for view action
+                    default:
+                        return;
+                }
+                
+                // Save updated orders back to localStorage
+                localStorage.setItem(ALL_ORDERS_KEY, JSON.stringify(allOrders));
+                
+                // Reload current view to reflect changes
+                const activeTab = document.querySelector('.order-tab.active');
+                if (activeTab) {
+                    const currentStatus = activeTab.getAttribute('data-status');
+                    loadOrders(currentStatus);
+                }
+            }
+
+            // Debug information
+            console.log("Shop name in localStorage:", localStorage.getItem(SHOP_NAME_KEY));
+            console.log("User data in localStorage:", localStorage.getItem(USER_KEY));
+            console.log("Navigation setup complete");
+        });
     </script>
 </body>
 </html>

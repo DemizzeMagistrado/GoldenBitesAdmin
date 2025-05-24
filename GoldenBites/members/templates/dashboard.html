@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Golden Bites - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         /* Reset and base styles */
         * {
@@ -154,6 +156,9 @@
         }
 
         .nav-item.active {
+            color: #0047ab;
+        }
+        .nav-item:hover {
             color: #0047ab;
         }
 
@@ -500,24 +505,23 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="settings-icon" id="settingsIcon">
-                ⚙️
+            <div class="settings-icon" id="settingsIcon"><i class="fa-solid fa-gear"></i>
             </div>
             
             <h1 id="shopNameHeading" class="centered-shop-name">Your Shop</h1>
             
             <div class="logo">
-                 <img src="static/members/img/logo.png" class="logo">
+                 <img src="{% static "img/logo.png" %}" class="logo">
             </div>
         </div>
         
         <div class="stats-container">
             <div class="stat-box">
-                <div class="stat-number">0</div>
+                <div class="stat-number" id="runningOrdersCount">0</div>
                 <div class="stat-label">RUNNING ORDERS</div>
             </div>
             <div class="stat-box">
-                <div class="stat-number">0</div>
+                <div class="stat-number" id="pendingOrdersCount">0</div>
                 <div class="stat-label">PENDING ORDERS</div>
             </div>
         </div>
@@ -525,11 +529,10 @@
         <div class="sales-container">
             <div class="sales-header">
                 <div>
-                    <div class="sales-amount">Total Sales: ₱</div>
+                    <div class="sales-amount" id="totalRevenueDisplay">Total Sales: ₱0.00</div>
                 </div>
-                <a href="order-summary.html" class="see-details">See Details</a>
-            
-            </div>
+                    <a href="{% url 'order_summary' %}" class="see-details">See Details</a>           
+                </div>
             
        <div class="graph">
             <div class="graph-line"></div>
@@ -549,163 +552,352 @@
         <div class="reviews-container">
             <div class="section-header">
                 <div class="section-title">Reviews</div>
-                <a href="review.html" class="see-details">See All Reviews</a>
-            </div>
+                <a href="{% url 'review' %}" class="see-details">See All Reviews</a>            </div>
             
             <div class="review-stars">
-                <div class="review-score">0.0</div>
+                <div class="review-score" id="averageRating">0.0</div>
                 <div class="star">★</div>
-                <div class="review-count">Total 0 Reviews</div>
+                <div class="review-count" id="totalReviewsCount">Total 0 Reviews</div>
             </div>
         </div>
         
         <div class="popular-container">
             <div class="section-header">
                 <div class="section-title">Popular Items This Week</div>
-                <a href="#" class="see-details">See All</a>
-            </div>
-            
-            <div class="food-items">
-                <div class="food-item">
-                    <img src="/placeholder.svg?height=80&width=120" alt="Waffle" class="food-image">
+                    <a href="{% url 'overview'%}" class="see-details">See All</a>       
                 </div>
+            <div class="food-items" id="popularItemsContainer">
                 <div class="food-item">
-                    <img src="/placeholder.svg?height=80&width=120" alt="Pancake" class="food-image">
+                    <img src="/placeholder.svg?height=80&width=120" alt="Popular Item" class="food-image">
                 </div>
             </div>
         </div>
         
-        <div class="nav-bar">
-            <div class="nav-item active">
-                <div class="nav-icon">&#127968;</div>
-                <div>Home</div>
-            </div>
-            <div class="nav-item">
-                <div class="nav-icon">&#128203;</div>
-                <div>Orders</div>
-            </div>
-            <div class="add-button">+</div>
-            <div class="nav-item">
-                <div class="nav-icon">&#128202;</div>
-                <div>Summary</div>
-            </div>
-            <div class="nav-item">
-                <div class="nav-icon">&#128200;</div>
-                <div>Sales Report</div>
-            </div>
-        </div>
+    <div class="nav-bar">
+    <div class="nav-item active" id="homeNav">
+        <div class="nav-icon"><i class="fa-solid fa-house"></i></div>
+        <div>Home</div>
     </div>
-    
-    <!-- Settings Modal -->
-    <div class="modal" id="settingsModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Settings</h2>
-                <span class="close-modal">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div class="user-info-section">
-                    <h3>User Information</h3>
-                    <div class="user-info-item">
-                        <label>Name:</label>
-                        <span id="userName">Loading...</span>
-                    </div>
-                    <div class="user-info-item">
-                        <label>Shop Name:</label>
-                        <span id="userShopName">Loading...</span>
-                    </div>
-                    <div class="user-info-item">
-                        <label>Email:</label>
-                        <span id="userEmail">Loading...</span>
-                    </div>
-                    <div class="user-info-item">
-                        <label>Phone:</label>
-                        <span id="userPhone">Loading...</span>
-                    </div>
-                </div>
-                
-                <div class="logout-container">
-                    <button id="logoutBtn" class="btn btn-danger">Logout</button>
-                </div>
-            </div>
-        </div>
+    <div class="nav-item" id="ordersNav">
+        <div class="nav-icon"><i class="fa-solid fa-table-list"></i></div>
+        <div>Orders</div>
     </div>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize dashboard
-            const shopNameHeading = document.getElementById('shopNameHeading');
-            if (shopNameHeading) {
-                // Set shop name from localStorage or default
-                const shopName = localStorage.getItem('shopName') || 'Your Shop';
-                shopNameHeading.textContent = shopName;
+    <div class="add-button" id="addButton">
+        +
+    </div>
+    <div class="nav-item" id="ordersummaryNav">
+        <div class="nav-icon"><i class="fa-solid fa-file"></i></div>
+        <div>Summary</div>
+    </div>
+    <div class="nav-item" id="overviewNav">
+        <div class="nav-icon"><i class="fa-solid fa-chart-simple"></i></div>
+        <div>Sales</div>
+    </div>
+    </div>
+
+  </div>
+
+  <div class="modal" id="settingsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <span class="close-modal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="user-info-section">
+          <h3>User Information</h3>
+          <div class="user-info-item"><label>Name:</label> <span id="userName">Loading...</span></div>
+          <div class="user-info-item"><label>Shop Name:</label> <span id="userShopName">Loading...</span></div>
+          <div class="user-info-item"><label>Email:</label> <span id="userEmail">Loading...</span></div>
+          <div class="user-info-item"><label>Phone:</label> <span id="userPhone">Loading...</span></div>
+        </div>
+        <div class="logout-container">
+          <button id="logoutBtn" class="btn btn-danger">Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+ <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const SHOP_NAME_KEY = 'goldenBites_shopName';
+        const USER_KEY = 'goldenBites_user';
+        const ALL_ORDERS_KEY = 'goldenBites_allOrders';
+        const REVENUE_DATA_KEY = 'goldenBites_revenueData';
+        const REVIEWS_KEY = 'goldenBites_reviews';
+        const POPULAR_ITEMS_KEY = 'goldenBites_popularItems';
+
+        function navigateTo(url) {
+          window.location.href = url;
+        }
+
+        function updateShopName() {
+          const shopNameHeading = document.getElementById("shopNameHeading");
+          const userData = localStorage.getItem(USER_KEY);
+          let shopName = "Your Shop";
+
+          if (userData) {
+            try {
+              const user = JSON.parse(userData);
+              if (user.shopName) {
+                shopName = user.shopName;
+                localStorage.setItem(SHOP_NAME_KEY, shopName);
+              }
+            } catch (e) {
+              console.error('Error parsing user data:', e);
             }
-            
-            // Settings modal functionality
-            const settingsIcon = document.getElementById('settingsIcon');
-            const settingsModal = document.getElementById('settingsModal');
-            const closeModal = document.querySelector('.close-modal');
-            
-            if (settingsIcon && settingsModal) {
-                settingsIcon.addEventListener('click', function() {
-                    settingsModal.style.display = 'block';
-                });
-                
-                closeModal.addEventListener('click', function() {
-                    settingsModal.style.display = 'none';
-                });
-                
-                window.addEventListener('click', function(event) {
-                    if (event.target === settingsModal) {
-                        settingsModal.style.display = 'none';
-                    }
-                });
-            }
-            
-            // Logout functionality
-            const logoutBtn = document.getElementById('logoutBtn');
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', function() {
-                    // Clear user data
-                    localStorage.removeItem('userToken');
-                    localStorage.removeItem('userData');
-                    
-                    // Redirect to login page
-                    window.location.href = 'login.html';
-                });
-            }
-            
-            // Load user info
-            function loadUserInfo() {
-                const userDataString = localStorage.getItem('userData');
-                if (userDataString) {
-                    try {
-                        const userData = JSON.parse(userDataString);
-                        
-                        // Update user info in settings modal
-                        document.getElementById('userName').textContent = userData.name || 'N/A';
-                        document.getElementById('userShopName').textContent = userData.shopName || 'N/A';
-                        document.getElementById('userEmail').textContent = userData.email || 'N/A';
-                        document.getElementById('userPhone').textContent = userData.phone || 'N/A';
-                    } catch (error) {
-                        console.error('Error parsing user data:', error);
-                    }
+          }
+
+          shopNameHeading.textContent = localStorage.getItem(SHOP_NAME_KEY) || shopName;
+        }
+
+        function loadUserInfo() {
+          const data = localStorage.getItem(USER_KEY);
+          if (data) {
+            try {
+              const user = JSON.parse(data);
+              document.getElementById('userName').textContent = user.name || 'N/A';
+              document.getElementById('userShopName').textContent = user.shopName || 'N/A';
+              document.getElementById('userEmail').textContent = user.email || 'N/A';
+              document.getElementById('userPhone').textContent = user.phone || 'N/A';
+            } catch (e) { console.error(e); }
+          }
+        }
+
+        // Function to update order counts on the dashboard
+        function updateDashboardOrderCounts() {
+            // Get orders from localStorage (shared with orders.html)
+            const allOrders = JSON.parse(localStorage.getItem(ALL_ORDERS_KEY)) || [
+                {
+                    id: 'S3700',
+                    status: 'pending',
+                    time: '10:30 AM',
+                    items: ['Pancake x2', 'Coffee x1'],
+                    total: 120
+                },
+                {
+                    id: 'S3701',
+                    status: 'preparing',
+                    time: '10:15 AM',
+                    items: ['Adobo x1', 'Rice x2'],
+                    total: 150
+                },
+                {
+                    id: 'S3702',
+                    status: 'ready',
+                    time: '10:00 AM',
+                    items: ['Spaghetti x1', 'Garlic Bread x1'],
+                    total: 180
                 }
+            ];
+
+            // Save default orders if none exist
+            if (!localStorage.getItem(ALL_ORDERS_KEY)) {
+                localStorage.setItem(ALL_ORDERS_KEY, JSON.stringify(allOrders));
             }
-            
-            loadUserInfo();
-            
-            // Navigation functionality
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    const page = this.getAttribute('data-page');
-                    if (page) {
-                        window.location.href = page + '.html';
-                    }
+
+            // Filter for running orders: preparing and ready
+            const runningOrders = allOrders.filter(order =>
+                order.status.toLowerCase() === 'preparing' || order.status.toLowerCase() === 'ready'
+            ).length;
+
+            // Filter for strictly pending orders
+            const pendingOrders = allOrders.filter(order =>
+                order.status.toLowerCase() === 'pending'
+            ).length;
+
+            // Update the DOM elements
+            const runningOrdersCountElement = document.getElementById('runningOrdersCount');
+            const pendingOrdersCountElement = document.getElementById('pendingOrdersCount');
+
+            if (runningOrdersCountElement) {
+                runningOrdersCountElement.textContent = runningOrders;
+            }
+            if (pendingOrdersCountElement) {
+                pendingOrdersCountElement.textContent = pendingOrders;
+            }
+        }
+
+        // Function to update revenue data from order-summary.html
+        function updateRevenueData() {
+            // Get revenue data from localStorage (shared with order-summary.html)
+            const revenueData = JSON.parse(localStorage.getItem(REVENUE_DATA_KEY)) || {
+                totalRevenue: 1350,
+                period: 'Today (May 22, 2025)'
+            };
+
+            // Save default revenue data if none exists
+            if (!localStorage.getItem(REVENUE_DATA_KEY)) {
+                localStorage.setItem(REVENUE_DATA_KEY, JSON.stringify(revenueData));
+            }
+
+            // Format currency
+            const formatCurrency = (amount) => {
+                return new Intl.NumberFormat('en-PH', {
+                    style: 'currency',
+                    currency: 'PHP',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(amount).replace('PHP', '₱');
+            };
+
+            // Update total revenue display
+            const totalRevenueDisplay = document.getElementById('totalRevenueDisplay');
+            if (totalRevenueDisplay) {
+                totalRevenueDisplay.textContent = `Total Sales: ${formatCurrency(revenueData.totalRevenue)}`;
+            }
+        }
+
+        // Function to update reviews data from reviews.html
+        function updateReviewsData() {
+            // Get reviews data from localStorage (shared with reviews.html)
+            const reviews = JSON.parse(localStorage.getItem(REVIEWS_KEY)) || [
+                { rating: 4, comment: 'Great food!' },
+                { rating: 3, comment: 'Good but could be better' },
+                { rating: 5, comment: 'Excellent service!' },
+                { rating: 4.5, comment: 'Amazing halo-halo!' },
+                { rating: 2, comment: 'Disappointing sisig' }
+            ];
+
+            // Save default reviews if none exist
+            if (!localStorage.getItem(REVIEWS_KEY)) {
+                localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews));
+            }
+
+            // Calculate average rating
+            const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+            const averageRating = reviews.length > 0 ? (totalRating / reviews.length).toFixed(1) : 0.0;
+
+            // Update reviews display
+            const averageRatingElement = document.getElementById('averageRating');
+            const totalReviewsCountElement = document.getElementById('totalReviewsCount');
+
+            if (averageRatingElement) {
+                averageRatingElement.textContent = averageRating;
+            }
+            if (totalReviewsCountElement) {
+                totalReviewsCountElement.textContent = `Total ${reviews.length} Reviews`;
+            }
+        }
+
+        // Function to update popular items (would come from overview.html)
+        function updatePopularItems() {
+            // Get popular items data from localStorage (shared with overview.html)
+            const popularItems = JSON.parse(localStorage.getItem(POPULAR_ITEMS_KEY)) || [
+                { name: 'Chicken Adobo', orderCount: 25, image: '/placeholder.svg?height=80&width=120' },
+                { name: 'Pancit', orderCount: 18, image: '/placeholder.svg?height=80&width=120' }
+            ];
+
+            // Save default popular items if none exist
+            if (!localStorage.getItem(POPULAR_ITEMS_KEY)) {
+                localStorage.setItem(POPULAR_ITEMS_KEY, JSON.stringify(popularItems));
+            }
+
+            // Find the most popular item
+            const mostPopular = popularItems.reduce((prev, current) => 
+                (prev.orderCount > current.orderCount) ? prev : current
+            );
+
+            // Update popular items display
+            const popularItemsContainer = document.getElementById('popularItemsContainer');
+            if (popularItemsContainer && mostPopular) {
+                popularItemsContainer.innerHTML = `
+                    <div class="food-item">
+                        <img src="${mostPopular.image}" alt="${mostPopular.name}" class="food-image">
+                        <div style="padding: 10px; text-align: center;">
+                            <div style="font-size: 12px; font-weight: 600;">${mostPopular.name}</div>
+                            <div style="font-size: 10px; color: #666;">${mostPopular.orderCount} orders</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function setupNavigation() {
+        const navMap = {
+            homeNav: "{% url 'dashboard' %}",
+            ordersNav: "{% url 'orders' %}",
+            addButton: "{% url 'add-item' %}",
+            overviewNav: "{% url 'order_summary' %}",
+            ordersummaryNav: "{% url 'overview' %}"
+        };
+
+        Object.keys(navMap).forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+            el.addEventListener('click', () => {
+                // Remove 'active' from all nav-items
+                document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
                 });
+
+                // Add 'active' only if it's a nav-item (not addButton)
+                if (el.classList.contains('nav-item')) {
+                el.classList.add('active');
+                }
+
+                // Navigate to the associated URL
+                navigateTo(navMap[id]);
             });
+            }
         });
+        }
+
+
+        const settingsIcon = document.getElementById('settingsIcon');
+        const settingsModal = document.getElementById('settingsModal');
+        const closeModal = document.querySelector('.close-modal');
+
+        if (settingsIcon && settingsModal) {
+          settingsIcon.addEventListener('click', () => settingsModal.style.display = 'block');
+          closeModal.addEventListener('click', () => settingsModal.style.display = 'none');
+          window.addEventListener('click', e => { if (e.target === settingsModal) settingsModal.style.display = 'none'; });
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+          localStorage.removeItem('userToken');
+          localStorage.removeItem(USER_KEY);
+          localStorage.removeItem(SHOP_NAME_KEY);
+          localStorage.removeItem(ALL_ORDERS_KEY);
+          localStorage.removeItem(REVENUE_DATA_KEY);
+          localStorage.removeItem(REVIEWS_KEY);
+          localStorage.removeItem(POPULAR_ITEMS_KEY);
+          window.location.href = '{% url "sign_in" %}';
+        });
+
+        // Initial load of data
+        updateShopName();
+        loadUserInfo();
+        setupNavigation();
+        updateDashboardOrderCounts();
+        updateRevenueData();
+        updateReviewsData();
+        updatePopularItems();
+
+        // Listen for storage changes to update data immediately when other pages modify it
+        window.addEventListener('storage', (event) => {
+            if (event.key === ALL_ORDERS_KEY) {
+                updateDashboardOrderCounts();
+            }
+            if (event.key === REVENUE_DATA_KEY) {
+                updateRevenueData();
+            }
+            if (event.key === REVIEWS_KEY) {
+                updateReviewsData();
+            }
+            if (event.key === POPULAR_ITEMS_KEY) {
+                updatePopularItems();
+            }
+        });
+
+        // Refresh data every 30 seconds to keep dashboard current
+        setInterval(() => {
+            updateDashboardOrderCounts();
+            updateRevenueData();
+            updateReviewsData();
+            updatePopularItems();
+        }, 30000);
+      });
     </script>
 </body>
 </html>

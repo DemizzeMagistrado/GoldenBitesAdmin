@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -249,20 +250,20 @@
                 <input type="email" name="email" class="form-input" placeholder="Enter your email" required>
             </div>
             <div class="form-group">
-                <label class="form-label">Password</label>
-                <div class="password-input-container">
-                    <input type="password" name="password" id="password" class="form-input" placeholder="Enter your password" required>
-                    <div class="password-toggle" onclick="togglePasswordVisibility('password', this)">
-                        <img src="assets/eye-close.png" alt="Toggle Password" class="eye-icon">
-                    </div>
+            <label class="form-label">Password</label>
+            <div class="password-input-container">
+                <input type="password" name="password" id="password" class="form-input" placeholder="Enter your password" required>
+                <div class="password-toggle" onclick="togglePasswordVisibility('password', this)">
+                    <img src="{% static 'img/eye-close.png' %}" alt="Toggle Password" class="eye-icon">
                 </div>
             </div>
+        </div>
             <div class="form-group">
                 <label class="form-label">Confirm Password</label>
                 <div class="password-input-container">
                     <input type="password" name="confirmPassword" id="confirmPassword" class="form-input" placeholder="Confirm your password" required>
                     <div class="password-toggle" onclick="togglePasswordVisibility('confirmPassword', this)">
-                        <img src="assets/eye-close.png" alt="Toggle Password" class="eye-icon">
+                        <img src="{% static 'img/eye-close.png' %}" alt="Toggle Password" class="eye-icon">
                     </div>
                 </div>
             </div>
@@ -279,152 +280,144 @@
             <div class="terms-container">
                 <input type="checkbox" id="termsCheckbox" class="terms-checkbox" required>
                 <label for="termsCheckbox" class="terms-text">
-                    I agree to the <a href="#" class="terms-link">Terms & Conditions</a> and <a href="#" class="terms-link">Privacy Policy</a>
+                    I agree to the 
+                    <a href="{% url 'policy_admin' %}" class="terms-link">Terms & Conditions</a> 
+                    and 
+                    <a href="{% url 'policy_admin' %}" class="terms-link">Privacy Policy</a>.
                 </label>
             </div>
+
             <button type="submit" class="btn btn-primary">Create Account</button>
+
             <div class="login-prompt">
-                Already have an account? <a href="sign-in.html" class="login-link">Login</a>
+                Already have an account? <a href="{% url 'sign_in' %}" class="login-link">Login</a>
             </div>
+
         </form>
     </div>
+<script>
+    // Data storage using localStorage
+    const FOOD_ITEMS_KEY = "goldenBites_foodItems";
+    const ORDERS_KEY = "goldenBites_orders";
+    const USER_KEY = "goldenBites_user";
+    const SHOP_NAME_KEY = "goldenBites_shopName";
+    const WORKING_DATE_KEY = "goldenBites_workingDate";
+    const REVIEWS_KEY = "goldenBites_reviews";
+    const RESET_TOKENS_KEY = "goldenBites_resetTokens";
 
-    <script>
-        // Data storage using localStorage
-        const FOOD_ITEMS_KEY = "goldenBites_foodItems";
-        const ORDERS_KEY = "goldenBites_orders";
-        const USER_KEY = "goldenBites_user";
-        const SHOP_NAME_KEY = "goldenBites_shopName";
-        const WORKING_DATE_KEY = "goldenBites_workingDate";
-        const REVIEWS_KEY = "goldenBites_reviews";
-        const RESET_TOKENS_KEY = "goldenBites_resetTokens";
-
-        // Initialize data
-        function initializeData() {
-            // Initialize food items if not exists
-            if (!localStorage.getItem(FOOD_ITEMS_KEY)) {
-                localStorage.setItem(FOOD_ITEMS_KEY, JSON.stringify([]));
-            }
-
-            // Initialize orders if not exists
-            if (!localStorage.getItem(ORDERS_KEY)) {
-                localStorage.setItem(ORDERS_KEY, JSON.stringify([]));
-            }
-
-            // Set default shop name if not exists
-            if (!localStorage.getItem(SHOP_NAME_KEY)) {
-                localStorage.setItem(SHOP_NAME_KEY, "Your Shop");
-            }
-
-            // Initialize reviews if not exists
-            if (!localStorage.getItem(REVIEWS_KEY)) {
-                localStorage.setItem(REVIEWS_KEY, JSON.stringify([]));
-            }
-
-            // Initialize reset tokens if not exists
-            if (!localStorage.getItem(RESET_TOKENS_KEY)) {
-                localStorage.setItem(RESET_TOKENS_KEY, JSON.stringify([]));
-            }
-
-            // Set working date to today if not exists
-            if (!localStorage.getItem(WORKING_DATE_KEY)) {
-                const today = new Date().toISOString().split("T")[0];
-                localStorage.setItem(WORKING_DATE_KEY, today);
-            }
+    // Initialize data
+    function initializeData() {
+        if (!localStorage.getItem(FOOD_ITEMS_KEY)) {
+            localStorage.setItem(FOOD_ITEMS_KEY, JSON.stringify([]));
         }
 
-        // User Authentication
-        function registerUser(name, shopName, email, password, phone) {
-            const user = {
-                name,
-                shopName,
-                email,
-                password, // In a real app, this should be hashed
-                phone,
-            };
-
-            localStorage.setItem(USER_KEY, JSON.stringify(user));
-            localStorage.setItem(SHOP_NAME_KEY, shopName);
-
-            return user;
+        if (!localStorage.getItem(ORDERS_KEY)) {
+            localStorage.setItem(ORDERS_KEY, JSON.stringify([]));
         }
 
-        // Toggle password visibility
-        function togglePasswordVisibility(inputId, toggleElement) {
-            const passwordInput = document.getElementById(inputId);
-            const eyeIcon = toggleElement.querySelector('.eye-icon');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                eyeIcon.src = 'assets/eye-open.png';
-            } else {
-                passwordInput.type = 'password';
-                eyeIcon.src = 'assets/eye-close.png';
-            }
+        if (!localStorage.getItem(SHOP_NAME_KEY)) {
+            localStorage.setItem(SHOP_NAME_KEY, "Your Shop");
         }
-        
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize data
-            initializeData();
-            
-            // Form validation
-            const signupForm = document.getElementById('signupForm');
-            if (signupForm) {
-                signupForm.addEventListener('submit', function(e) {
+
+        if (!localStorage.getItem(REVIEWS_KEY)) {
+            localStorage.setItem(REVIEWS_KEY, JSON.stringify([]));
+        }
+
+        if (!localStorage.getItem(RESET_TOKENS_KEY)) {
+            localStorage.setItem(RESET_TOKENS_KEY, JSON.stringify([]));
+        }
+
+        if (!localStorage.getItem(WORKING_DATE_KEY)) {
+            const today = new Date().toISOString().split("T")[0];
+            localStorage.setItem(WORKING_DATE_KEY, today);
+        }
+    }
+
+    // User Authentication
+    function registerUser(name, shopName, email, password, phone) {
+        const user = {
+            name,
+            shopName,
+            email,
+            password, // In a real app, this should be hashed
+            phone,
+        };
+
+        localStorage.setItem(USER_KEY, JSON.stringify(user));
+        localStorage.setItem(SHOP_NAME_KEY, shopName);
+
+        return user;
+    }
+
+    // Toggle password visibility
+    function togglePasswordVisibility(fieldId, toggleElement) {
+        const passwordField = document.getElementById(fieldId);
+        const eyeIcon = toggleElement.querySelector('.eye-icon');
+
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            eyeIcon.src = "{% static 'img/eye-open.png' %}";
+        } else {
+            passwordField.type = 'password';
+            eyeIcon.src = "{% static 'img/eye-close.png' %}";
+        }
+    }
+
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', function () {
+        initializeData();
+
+        const signupForm = document.getElementById('signupForm');
+        if (signupForm) {
+            signupForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const name = this.querySelector('[name="name"]').value.trim();
+                const shopName = this.querySelector('[name="shopName"]').value.trim();
+                const email = this.querySelector('[name="email"]').value.trim();
+                const password = this.querySelector('[name="password"]').value.trim();
+                const confirmPassword = this.querySelector('[name="confirmPassword"]').value.trim();
+                const phone = this.querySelector('[name="phone"]').value.trim();
+                const termsCheckbox = document.getElementById('termsCheckbox');
+
+                if (!name || !shopName || !email || !password || !confirmPassword || !phone) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match');
+                    return;
+                }
+
+                if (!termsCheckbox.checked) {
+                    alert('Please agree to the Terms and Conditions');
+                    return;
+                }
+
+                registerUser(name, shopName, email, password, `+63${phone}`);
+                window.location.href = "{% url 'dashboard' %}";
+            }); 
+        }
+
+        const backIcon = document.querySelector('.back-icon');
+        if (backIcon) {
+            backIcon.addEventListener('click', function () {
+                window.history.back();
+            });
+        }
+
+        const termsLinks = document.querySelectorAll('.terms-link');
+        if (termsLinks.length > 0) {
+            termsLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
                     e.preventDefault();
-                    
-                    const name = this.querySelector('[name="name"]').value.trim();
-                    const shopName = this.querySelector('[name="shopName"]').value.trim();
-                    const email = this.querySelector('[name="email"]').value.trim();
-                    const password = this.querySelector('[name="password"]').value.trim();
-                    const confirmPassword = this.querySelector('[name="confirmPassword"]').value.trim();
-                    const phone = this.querySelector('[name="phone"]').value.trim();
-                    const termsCheckbox = document.getElementById('termsCheckbox');
-                    
-                    // Validate inputs
-                    if (!name || !shopName || !email || !password || !confirmPassword || !phone) {
-                        alert('Please fill in all required fields');
-                        return;
-                    }
-                    
-                    if (password !== confirmPassword) {
-                        alert('Passwords do not match');
-                        return;
-                    }
-                    
-                    if (!termsCheckbox.checked) {
-                        alert('Please agree to the Terms and Conditions');
-                        return;
-                    }
-                    
-                    // Register the user
-                    registerUser(name, shopName, email, password, `+63${phone}`);
-                    
-                    // Redirect to dashboard page
-                    window.location.href = 'dashboard.html';
+                    window.location.href = '/policy-admin/';
                 });
-            }
-            
-            // Back button functionality
-            const backIcon = document.querySelector('.back-icon');
-            if (backIcon) {
-                backIcon.addEventListener('click', function() {
-                    window.history.back();
-                });
-            }
-            
-            // Terms links functionality
-            const termsLinks = document.querySelectorAll('.terms-link');
-            if (termsLinks.length > 0) {
-                termsLinks.forEach(link => {
-                    link.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        window.location.href = 'policy.html';
-                    });
-                });
-            }
-        });
-    </script>
+            });
+        }
+    });
+</script>
+
 </body>
 </html>

@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Golden Bites - Overview</title>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* Reset and base styles */
@@ -66,11 +67,6 @@
             text-align: center;
         }
 
-        .logo {
-            width: 35px;
-            height: 35px;
-        }
-
         /* Overview Header */
         .overview-header {
             display: flex;
@@ -106,7 +102,7 @@
         }
 
         .time-option {
-            padding: 8px 15px;
+            padding: 8px 13px;
             font-size: 14px;
             color: #666;
             background-color: #f5f5f5;
@@ -364,7 +360,7 @@
             margin-bottom: 2px;
         }
 
-        .nav-item.active {
+        .nav-item.active, .nav-item:hover{
             color: #0047ab;
         }
 
@@ -467,7 +463,7 @@
     <div class="container">
         <div class="header">
             <div class="back-icon" id="back-icon">&#8592;</div>
-            <h1 id="shopNameHeading" class="centered-shop-name">Golden Bites Shop</h1>
+            <h1 id="shopNameHeading" class="centered-shop-name">Your Shop</h1>
             <div class="logo">
                 <img src="{% static 'assets/logo.png' %}" class="logo" onerror="this.src='https://placehold.co/35x35/E0E0E0/333333?text=Logo'">
             </div>
@@ -535,25 +531,27 @@
                 </div>
         </div>
         
-        <div class="nav-bar">
+            <div class="nav-bar">
             <div class="nav-item" id="homeNav">
-                <div class="nav-icon">&#127968;</div>
+                <div class="nav-icon"><i class="fa-solid fa-house"></i></div>
                 <div>Home</div>
             </div>
             <div class="nav-item" id="ordersNav">
-                <div class="nav-icon">&#128203;</div>
+                <div class="nav-icon"><i class="fa-solid fa-table-list"></i></div>
                 <div>Orders</div>
             </div>
-            <div class="add-button" id="addButton">+</div>
-            <div class="nav-item active" id="summaryNav">
-                <div class="nav-icon">&#128202;</div>
+            <div class="add-button" id="addButton">
+                +
+            </div>
+            <div class="nav-item active" id="ordersummaryNav">
+                <div class="nav-icon"><i class="fa-solid fa-file"></i></div>
                 <div>Summary</div>
             </div>
-            <div class="nav-item" id="salesReportNav">
-                <div class="nav-icon">&#128200;</div>
-                <div>Sales Report</div>
+            <div class="nav-item" id="overviewNav">
+                <div class="nav-icon"><i class="fa-solid fa-chart-simple"></i></div>
+                <div>Sales</div>
             </div>
-        </div>
+            </div>
     </div>
     
     <div id="customAlertModal" class="custom-alert-modal">
@@ -565,6 +563,7 @@
     </div>
 
     <script>
+        
         // Function to show custom alert modal
         function showAlert(title, message) {
             const modal = document.getElementById('customAlertModal');
@@ -582,13 +581,15 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize with default data
-            // No need to check authentication for demo purposes
+            // Constants for localStorage keys
+            const REVENUE_DATA_KEY = 'goldenBites_revenueData'; // Shared with dashboard
+            const SHOP_NAME_KEY = 'goldenBites_shopName';
             
             // Set shop name
             const shopNameHeading = document.getElementById('shopNameHeading');
             if (shopNameHeading) {
-                shopNameHeading.textContent = "Golden Bites Shop";
+                const shopName = localStorage.getItem(SHOP_NAME_KEY) || "Golden Bites Shop";
+                shopNameHeading.textContent = shopName;
             }
             
             // Load data for default time period (24 hours)
@@ -637,36 +638,24 @@
                 });
             }
             
-            // Add event listeners to navigation items
-            const homeNav = document.getElementById('homeNav');
-            const ordersNav = document.getElementById('ordersNav');
-            const summaryNav = document.getElementById('summaryNav');
-            const salesReportNav = document.getElementById('salesReportNav');
-            const addButton = document.getElementById('addButton');
-            
-            if (homeNav) {
-                homeNav.addEventListener('click', function() {
-                    window.location.href = "{% url 'dashboard' %}";
-                });
-            }
-            
-            if (ordersNav) {
-                ordersNav.addEventListener('click', function() {
-                    window.location.href = "{% url 'orders' %}";
-                });
-            }
-            
-            if (salesReportNav) {
-                salesReportNav.addEventListener('click', function() {
-                    window.location.href = "{% url 'order_summary' %}";
-                });
-            }
-            
-            if (addButton) {
-                addButton.addEventListener('click', function() {
-                    window.location.href = "{% url 'add_item' %}";
-                });
-            }
+         // Add event listeners to navigation items
+            const navMap = {
+                homeNav: "{% url 'dashboard' %}",
+                ordersNav: "{% url 'orders' %}",
+                addButton: "{% url 'add-item' %}",
+                overviewNav: "{% url 'order_summary' %}",
+                ordersummaryNav: "{% url 'overview' %}"
+            };
+
+            Object.keys(navMap).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('click', () => {
+                        window.location.href = navMap[id];
+                    });
+                }
+            });
+
             
             // Add event listener to back icon
             const backIcon = document.getElementById('back-icon');
@@ -693,7 +682,7 @@
                         itemsSold: 2500,
                         topItems: [
                             { rank: 1, name: 'Adobo', category: 'Main Dish', sales: 450, image: 'https://placehold.co/50x50/E0E0E0/333333?text=Adobo' },
-                            { rank: 2, name: 'Pancake', category: 'Breakfast', sales: 380, image: 'https://placehold.co/50x50/E0E0E0/333333?text=Pancake' },
+                            { rank: 2, name: 'Pancake', category: 'Breakfast', sales: 380, image: 'pancake.jpg'},
                             { rank: 3, name: 'Spaghetti', category: 'Pasta', sales: 320, image: 'https://placehold.co/50x50/E0E0E0/333333?text=Spaghetti' }
                         ],
                         recentOrders: [

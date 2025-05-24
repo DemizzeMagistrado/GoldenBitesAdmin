@@ -48,6 +48,9 @@ def payment_view(request):
 def policy_view(request):
     return render(request, 'policy.html')
 
+def policy_admin_view(request):
+    return render(request, 'policy-admin.html')
+
 # This is the correct product_detail_view, as product-detail.html expects 'id' via query parameter
 def product_detail_view(request):
     # Your product-detail.html's JavaScript already handles fetching the product data
@@ -73,9 +76,7 @@ def welcome_view(request):
     return render(request, 'welcome.html')
 
 def landing_view(request):
-    # Your landing page view logic here
     return render(request, 'landing.html')
 
 def customer_sign_up_view(request):
-    # Your customer sign-up view logic here
     return render(request, 'customer/sign-up.html')

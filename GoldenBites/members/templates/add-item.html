@@ -5,6 +5,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <title>Add Item - Golden Bites</title>
     <style>
         /* Reset and base styles */
@@ -44,8 +46,7 @@
             margin-bottom: 20px;
         }
 
-        .back-icon,
-        .settings-icon {
+        .back-icon {
             font-size: 24px;
             cursor: pointer;
             width: 40px;
@@ -66,7 +67,7 @@
         }
 
         .logo {
-            width: 35px;
+            width:  35px;
             height: 35px;
         }
 
@@ -103,7 +104,7 @@
             margin-bottom: 2px;
         }
 
-        .nav-item.active {
+        .nav-item.active, .nav-item:hover{
             color: #0047ab;
         }
 
@@ -230,8 +231,8 @@
         <div class="header">
             <div class="back-icon">&#8592;</div>
             <h1 id="shopNameHeading" class="centered-shop-name">Your Shop</h1>
-            <div class="logo">
-                <img src="{% static 'img/logo.png' %}" alt="Logo">
+           <div class="logo">
+                 <img src="{% static 'img/logo.png' %}" class="logo" alt="Logo">
             </div>
         </div>
 
@@ -286,26 +287,30 @@
 
             <button id="saveItemBtn" class="submit-btn">Save Item</button>
         </div>
-
+        
+        <!-- Navigation Bar -->
         <div class="nav-bar">
-            <div class="nav-item" onclick="navigateTo('dashboard.html')">
-                <div class="nav-icon">🏠</div>
-                <div>Home</div>
-            </div>
-            <div class="nav-item" onclick="navigateTo('orders.html')">
-                <div class="nav-icon">📋</div>
-                <div>Orders</div>
-            </div>
-            <div class="add-button" onclick="navigateTo('add-item.html')">+</div>
-            <div class="nav-item" onclick="navigateTo('overview.html')">
-                <div class="nav-icon">📊</div>
-                <div>Overview</div>
-            </div>
-            <div class="nav-item" onclick="navigateTo('order-summary.html')">
-                <div class="nav-icon">📈</div>
-                <div>Summary</div>
-            </div>
+        <div class="nav-item " id="homeNav">
+            <div class="nav-icon"><i class="fa-solid fa-house"></i></div>
+            <div>Home</div>
         </div>
+        <div class="nav-item" id="ordersNav">
+            <div class="nav-icon"><i class="fa-solid fa-table-list"></i></div>
+            <div>Orders</div>
+        </div>
+        <div class="add-button" id="addButton">
+            +
+        </div>
+        <div class="nav-item" id="ordersummaryNav">
+            <div class="nav-icon"><i class="fa-solid fa-file"></i></div>
+            <div>Summary</div>
+        </div>
+        <div class="nav-item" id="overviewNav">
+            <div class="nav-icon"><i class="fa-solid fa-chart-simple"></i></div>
+            <div>Sales</div>
+        </div>
+        </div>
+    </div>
     </div>
 
     <script src="{% static 'members/js/scripts.js' %}"></script>
@@ -394,6 +399,32 @@
             
             // Setup back button
             setupBackButton();
+
+            // Setup Navigation
+            setupNavigation();
+        }
+
+        //Nav bar
+        function setupNavigation() {
+            document.getElementById('homeNav')?.addEventListener('click', () => {
+                navigateTo('{% url "dashboard" %}');
+            });
+            
+            document.getElementById('ordersNav')?.addEventListener('click', () => {
+                navigateTo('{% url "orders" %}');
+            });
+            
+            document.getElementById('addButton')?.addEventListener('click', () => {
+                navigateTo('{% url "add-item" %}');
+            });
+            
+             document.getElementById('ordersummaryNav')?.addEventListener('click', () => {
+                navigateTo('{% url "overview" %}');
+            });
+            
+            document.getElementById('overviewNav')?.addEventListener('click', () => {
+                navigateTo('{% url "order_summary" %}');
+            });
         }
 
         // Load item for editing
@@ -432,6 +463,8 @@
             }
         }
 
+        const foodListUrl = "{% url 'food_list' %}"; 
+
         // Setup save button
         function setupSaveButton(editItemId) {
             const saveButton = document.getElementById('saveItemBtn');
@@ -468,11 +501,15 @@
                     }
                     
                     // Navigate to food list
-                    navigateTo('food-list.html');
+                     navigateTo(foodListUrl); 
                 });
             }
         }
-
+         // Assuming navigateTo is defined elsewhere or in this script
+        function navigateTo(url) {
+            window.location.href = url;
+        }
+        
         // Update food item
         function updateFoodItem(id, updates) {
             const foodItems = JSON.parse(localStorage.getItem(FOOD_ITEMS_KEY)) || [];

@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Golden Bites - Overview</title>
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* Reset and base styles */
@@ -106,7 +107,7 @@
         }
 
         .time-option {
-            padding: 8px 15px;
+             padding: 8px 13px;
             font-size: 14px;
             color: #666;
             background-color: #f5f5f5;
@@ -291,7 +292,7 @@
             margin-bottom: 2px;
         }
 
-        .nav-item.active {
+        .nav-item.active, .nav-item:hover{
             color: #0047ab;
         }
 
@@ -473,25 +474,29 @@
             </div>
         </div>
         
+       
         <div class="nav-bar">
-            <div class="nav-item" id="homeNav">
-                <div class="nav-icon">&#127968;</div>
-                <div>Home</div>
-            </div>
-            <div class="nav-item" id="ordersNav">
-                <div class="nav-icon">&#128203;</div>
-                <div>Orders</div>
-            </div>
-            <div class="add-button" id="addButton">+</div>
-            <div class="nav-item" id="summaryNav">
-                <div class="nav-icon">&#128202;</div>
-                <div>Summary</div>
-            </div>
-            <div class="nav-item active" id="salesReportNav">
-                <div class="nav-icon">&#128200;</div>
-                <div>Sales Report</div>
-            </div>
+        <div class="nav-item" id="homeNav">
+            <div class="nav-icon"><i class="fa-solid fa-house"></i></div>
+            <div>Home</div>
         </div>
+        <div class="nav-item" id="ordersNav">
+            <div class="nav-icon"><i class="fa-solid fa-table-list"></i></div>
+            <div>Orders</div>
+        </div>
+        <div class="add-button" id="addButton">
+            +
+        </div>
+        <div class="nav-item" id="ordersummaryNav">
+            <div class="nav-icon"><i class="fa-solid fa-file"></i></div>
+            <div>Summary</div>
+        </div>
+        <div class="nav-item active" id="overviewNav">
+            <div class="nav-icon"><i class="fa-solid fa-chart-simple"></i></div>
+            <div>Sales</div>
+        </div>
+        </div>
+
     </div>
     
     <div id="customAlertModal" class="custom-alert-modal">
@@ -562,13 +567,15 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize with default data
-            // No need to check authentication for demo purposes
+            // Constants for localStorage keys
+            const REVENUE_DATA_KEY = 'goldenBites_revenueData'; // Shared with dashboard
+            const SHOP_NAME_KEY = 'goldenBites_shopName';
             
             // Set shop name
             const shopNameHeading = document.getElementById('shopNameHeading');
             if (shopNameHeading) {
-                shopNameHeading.textContent = "Golden Bites Shop";
+                const shopName = localStorage.getItem(SHOP_NAME_KEY) || "Golden Bites Shop";
+                shopNameHeading.textContent = shopName;
             }
             
             // Load sales data for default time period (24 hours)
@@ -596,36 +603,52 @@
                 });
             }
             
-            // Add event listeners to navigation items
+           // Add event listeners to navigation items and highlight active item
             const homeNav = document.getElementById('homeNav');
             const ordersNav = document.getElementById('ordersNav');
-            const summaryNav = document.getElementById('summaryNav');
-            const salesReportNav = document.getElementById('salesReportNav');
+            const ordersummaryNav = document.getElementById('ordersummaryNav');
+            const overviewNav = document.getElementById('overviewNav');
             const addButton = document.getElementById('addButton');
-            
-            if (homeNav) {
-                homeNav.addEventListener('click', function() {
-                    window.location.href = "{% url 'dashboard' %}";
-                });
-            }
-            
-            if (ordersNav) {
-                ordersNav.addEventListener('click', function() {
-                    window.location.href = "{% url 'orders' %}";
-                });
-            }
-            
-            if (summaryNav) {
-                summaryNav.addEventListener('click', function() {
-                    window.location.href = "{% url 'overview' %}";
-                });
-            }
-            
+
+            // Define a mapping of nav elements to their URLs
+            const navMap = {
+                homeNav: "{% url 'dashboard' %}",
+                ordersNav: "{% url 'orders' %}",
+                addButton: "{% url 'add-item' %}",
+                overviewNav: "{% url 'order_summary' %}",
+                ordersummaryNav: "{% url 'overview' %}"
+            };
+
+            // Get current path
+            const currentPath = window.location.pathname;
+
+            // Loop through the map and set click + active logic
+            Object.entries(navMap).forEach(([id, url]) => {
+                const navItem = document.getElementById(id);
+                if (navItem) {
+                    // Set click handler
+                    navItem.addEventListener('click', function () {
+                        window.location.href = url;
+                    });
+
+                    // Set active class based on URL match
+                    const tempLink = document.createElement('a');
+                    tempLink.href = url;
+                    if (tempLink.pathname === currentPath) {
+                        navItem.classList.add('active');
+                    } else {
+                        navItem.classList.remove('active');
+                    }
+                }
+            });
+
+            // Handle Add button separately (no active state, unless you want it)
             if (addButton) {
-                addButton.addEventListener('click', function() {
-                    window.location.href = "{% url 'add_item' %}";
+                addButton.addEventListener('click', function () {
+                    window.location.href = "{% url 'add-item' %}";
                 });
             }
+
             
             // Add event listener to back icon
             const backIcon = document.getElementById('back-icon');
@@ -678,6 +701,13 @@
                     };
                     break;
             }
+            
+            // Save revenue data to localStorage for sharing with dashboard
+            const revenueData = {
+                totalRevenue: salesData.totalRevenue,
+                period: salesData.revenuePeriod
+            };
+            localStorage.setItem('goldenBites_revenueData', JSON.stringify(revenueData));
             
             // Update UI with sales data
             updateSalesUI(salesData);
